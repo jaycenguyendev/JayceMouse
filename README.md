@@ -28,7 +28,11 @@ Requires macOS 14 or later (Apple Silicon and Intel).
 
 Updating: replace the app with the new version. Because releases are ad-hoc signed, macOS forgets the Accessibility permission after an update. Remove JayceMouse from the Accessibility list with the minus button, then add it back (or toggle it off and on).
 
-Check the download with `shasum -a 256 -c JayceMouse-<version>.zip.sha256` if you like.
+To confirm the zip was built by this repository's release workflow (and not tampered with), run, with the [GitHub CLI](https://cli.github.com/):
+```bash
+gh attestation verify JayceMouse.zip --repo jaycenguyendev/JayceMouse
+```
+Releases from v1.0.1 on carry this attestation. The `.sha256` files next to each zip only catch a corrupted download.
 
 ## Features
 - **Smooth scrolling**: off / low / regular / high, speed low/medium/high with tick acceleration, natural direction, trackpad-style scroll phases.
