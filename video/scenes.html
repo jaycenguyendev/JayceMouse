@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>JayceMouse launch video</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0c10; --surface: #15161d; --surface-2: #1c1d26; --line: rgba(255,255,255,.09); --line-strong: rgba(255,255,255,.16);
+  --text: #eceef4; --muted: #9a9cab; --violet: #735cfa; --cyan: #1abdeb; --pink: #fa5c9e; --mint: #33d69e;
+  --brand: linear-gradient(120deg, var(--violet), var(--cyan));
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+body { font-family: "Plus Jakarta Sans", sans-serif; color: var(--text); -webkit-font-smoothing: antialiased; }
+#stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+.layer { position: absolute; inset: 0; }
+.scene { position: absolute; inset: 0; opacity: 0; will-change: transform, opacity; }
+.center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.grad { background: var(--brand); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.glow { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; }
+#grain { position: absolute; inset: -50%; opacity: .07; mix-blend-mode: overlay; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E"); }
+#vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0,0,0,.55) 100%); }
+
+/* Horizon */
+#horizon-wrap { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+#horizon { position: absolute; left: 50%; width: 3000px; height: 3000px; margin-left: -1500px; border-radius: 50%;
+  background: radial-gradient(closest-side, #0b0c10 93%, #13111f 97.5%, #1d1838 100%); }
+#horizon::before { content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: linear-gradient(90deg, transparent 25%, var(--violet) 41%, #d4ccff 50%, var(--cyan) 59%, transparent 75%);
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 3px), #000 calc(100% - 1px)); }
+#horizon-glow { position: absolute; left: 50%; width: 1500px; height: 420px; margin-left: -750px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(115,92,250,.55), rgba(26,189,235,.18) 55%, transparent); filter: blur(40px); }
+
+/* Typography */
+.kicker { font-size: 26px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.h1 { font-size: 112px; font-weight: 800; letter-spacing: -.04em; line-height: 1.02; text-align: center; }
+.h2 { font-size: 78px; font-weight: 800; letter-spacing: -.035em; line-height: 1.05; }
+.sub { font-size: 32px; color: var(--muted); font-weight: 500; }
+.chip { display: inline-flex; align-items: center; gap: 12px; padding: 10px 22px 10px 10px; border-radius: 999px; background: rgba(255,255,255,.05); border: 1px solid var(--line-strong); font-size: 24px; font-weight: 600; color: var(--muted); }
+.chip b { padding: 6px 16px; border-radius: 999px; background: var(--brand); color: #fff; font-size: 20px; letter-spacing: .08em; }
+
+/* Logo */
+.logo-mark { width: 150px; height: 150px; border-radius: 44px; background: var(--brand); display: grid; place-items: center;
+  box-shadow: 0 30px 80px -20px rgba(115,92,250,.9), inset 0 2px 0 rgba(255,255,255,.35); }
+.logo-mark i { position: relative; width: 52px; height: 86px; border-radius: 28px; background: #fff; }
+.logo-mark i::after { content: ""; position: absolute; left: 22px; top: 14px; width: 8px; height: 22px; border-radius: 4px; background: var(--violet); }
+.logo-sm { width: 64px; height: 64px; border-radius: 19px; }
+.logo-sm i { width: 22px; height: 36px; border-radius: 12px; }
+.logo-sm i::after { left: 9px; top: 6px; width: 4px; height: 9px; }
+
+/* Trackpad illustration */
+.trackpad { width: 620px; height: 420px; border-radius: 40px; position: relative;
+  background: linear-gradient(160deg, #f4f5f9 0%, #d9dce5 55%, #b9bdca 100%);
+  box-shadow: 0 60px 120px -40px rgba(0,0,0,.9), inset 0 2px 0 #fff, inset 0 -3px 0 rgba(0,0,0,.18); }
+.trackpad::after { content: ""; position: absolute; inset: 0; border-radius: 40px; background: linear-gradient(115deg, rgba(255,255,255,.65) 0%, transparent 35%); }
+.price-tag { position: absolute; right: -60px; top: -50px; padding: 18px 34px; border-radius: 22px; background: #fff; color: #111218; font-size: 64px; font-weight: 800; letter-spacing: -.03em; box-shadow: 0 24px 60px -20px rgba(0,0,0,.7); }
+.price-tag .strike { position: absolute; left: 14px; right: 14px; top: 50%; height: 8px; margin-top: -4px; border-radius: 4px; background: var(--pink); transform-origin: left center; transform: scaleX(0) rotate(-8deg); }
+.zero { font-size: 300px; font-weight: 800; letter-spacing: -.06em; line-height: .9; }
+
+/* Mouse */
+.mouse { width: 300px; position: relative; }
+.mouse svg { width: 100%; filter: drop-shadow(0 40px 40px rgba(0,0,0,.6)); overflow: visible; }
+.mouse .floor { position: absolute; left: 50%; bottom: -70px; width: 320px; height: 50px; margin-left: -160px; border-radius: 50%; background: radial-gradient(closest-side, rgba(0,0,0,.8), transparent); }
+
+/* Scroll compare */
+.panel { width: 600px; height: 620px; border-radius: 30px; background: var(--surface); border: 1px solid var(--line); overflow: hidden; position: relative; }
+.panel.smooth { border-color: rgba(115,92,250,.55); box-shadow: 0 0 0 1px rgba(115,92,250,.25), 0 40px 120px -40px rgba(115,92,250,.7); }
+.panel-head { display: flex; justify-content: space-between; align-items: center; padding: 24px 30px; border-bottom: 1px solid var(--line); font-size: 26px; font-weight: 700; }
+.panel-head span { font-size: 20px; color: var(--muted); font-weight: 600; }
+.panel .viewport { position: absolute; top: 80px; left: 0; right: 0; bottom: 0; overflow: hidden; }
+.panel .viewport::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 120px; background: linear-gradient(transparent, var(--surface)); }
+.rows { padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+.row { display: flex; align-items: center; gap: 18px; height: 76px; padding: 0 22px; border-radius: 18px; background: var(--surface-2); border: 1px solid var(--line); font-size: 24px; font-weight: 600; flex: none; }
+.row i { width: 40px; height: 40px; border-radius: 12px; flex: none; }
+.row small { margin-left: auto; color: #6b6d7c; font-size: 19px; }
+
+/* Step captions */
+.caption { position: absolute; left: 150px; top: 140px; width: 620px; }
+.caption .chip { margin-bottom: 30px; }
+.caption .h2 { margin-bottom: 22px; }
+
+/* Window chrome */
+.win { position: absolute; border-radius: 26px; background: #17181f; border: 1px solid var(--line-strong); box-shadow: 0 60px 140px -40px rgba(0,0,0,.95); overflow: hidden; }
+.win-bar { height: 64px; display: flex; align-items: center; gap: 12px; padding: 0 24px; border-bottom: 1px solid var(--line); font-size: 22px; font-weight: 700; color: var(--muted); }
+.dots { display: flex; gap: 10px; margin-right: 18px; }
+.dots i { width: 16px; height: 16px; border-radius: 50%; background: #ff5f57; }
+.dots i:nth-child(2) { background: #febc2e; } .dots i:nth-child(3) { background: #28c840; }
+
+/* Release card */
+.asset { display: flex; align-items: center; gap: 20px; padding: 22px 26px; border-radius: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.02); font-size: 26px; font-weight: 600; margin-top: 16px; }
+.asset small { margin-left: auto; color: var(--muted); font-size: 22px; font-weight: 500; }
+.asset .zip { width: 46px; height: 46px; border-radius: 12px; background: var(--brand); display: grid; place-items: center; color: #fff; font-size: 16px; font-weight: 800; }
+.asset.dim { opacity: .55; }
+.progress { height: 10px; border-radius: 5px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 22px; }
+.progress i { display: block; height: 100%; width: 0; background: var(--brand); border-radius: 5px; }
+.folder { position: absolute; width: 230px; height: 190px; }
+.folder .back { position: absolute; inset: 22px 0 0; border-radius: 22px; background: linear-gradient(180deg, #4fa3ff, #2b6fe0); }
+.folder .tab { position: absolute; left: 0; top: 0; width: 100px; height: 50px; border-radius: 16px 16px 0 0; background: #3f8ef5; }
+.folder .front { position: absolute; inset: 52px 0 0; border-radius: 20px; background: linear-gradient(180deg, #6bb6ff, #3a82f0); box-shadow: inset 0 2px 0 rgba(255,255,255,.4); display: grid; place-items: center; color: rgba(255,255,255,.85); font-size: 20px; font-weight: 700; }
+.app-icon { position: absolute; width: 150px; height: 150px; border-radius: 40px; background: var(--brand); display: grid; place-items: center; box-shadow: 0 30px 60px -20px rgba(115,92,250,.9), inset 0 2px 0 rgba(255,255,255,.35); }
+.app-icon i { position: relative; width: 50px; height: 82px; border-radius: 26px; background: #fff; }
+
+/* macOS dialog */
+.dialog { position: absolute; width: 560px; padding: 44px 40px 34px; border-radius: 36px; background: rgba(40,41,50,.96); border: 1px solid var(--line-strong); box-shadow: 0 60px 140px -30px rgba(0,0,0,.95); text-align: center; }
+.dialog .ico { width: 96px; height: 96px; margin: 0 auto 22px; border-radius: 24px; background: linear-gradient(180deg, #8a8d99, #55586a); display: grid; place-items: center; position: relative; }
+.dialog .ico::after { content: "!"; position: absolute; right: -10px; bottom: -10px; width: 46px; height: 46px; border-radius: 12px; background: #febc2e; color: #111; font-weight: 800; font-size: 30px; display: grid; place-items: center; }
+.dialog h3 { font-size: 30px; margin-bottom: 14px; }
+.dialog p { font-size: 22px; color: #c3c5d1; line-height: 1.4; margin-bottom: 30px; }
+.dbtn { display: block; padding: 16px; border-radius: 16px; background: rgba(255,255,255,.1); font-size: 23px; font-weight: 600; margin-top: 12px; }
+.dbtn.trash { color: #d6d7df; }
+
+/* Settings */
+.settings { display: grid; grid-template-columns: 300px 1fr; height: calc(100% - 64px); }
+.settings aside { background: #1c1d24; border-right: 1px solid var(--line); padding: 26px 18px; display: flex; flex-direction: column; gap: 8px; }
+.settings aside span { padding: 12px 16px; border-radius: 12px; font-size: 21px; font-weight: 600; color: #b5b7c4; display: flex; align-items: center; gap: 12px; }
+.settings aside span i { width: 26px; height: 26px; border-radius: 7px; background: #3d7cf2; flex: none; }
+.settings aside span.on { background: #3a6fdc; color: #fff; }
+.settings main { padding: 34px 40px; }
+.settings h4 { font-size: 32px; margin-bottom: 24px; }
+.sec { border-radius: 18px; background: rgba(255,255,255,.04); border: 1px solid var(--line); padding: 8px 26px; }
+.sec-row { display: flex; align-items: center; gap: 18px; padding: 20px 0; font-size: 23px; font-weight: 600; border-top: 1px solid var(--line); }
+.sec-row:first-child { border-top: 0; }
+.sec-row small { display: block; color: var(--muted); font-size: 19px; font-weight: 500; margin-top: 4px; }
+.sec-row .grow { flex: 1; }
+.btn-os { padding: 12px 24px; border-radius: 12px; background: rgba(255,255,255,.12); font-size: 21px; font-weight: 700; position: relative; }
+.btn-os .ok { position: absolute; inset: 0; border-radius: 12px; background: var(--mint); color: #062; display: grid; place-items: center; opacity: 0; }
+.appico { width: 46px; height: 46px; border-radius: 12px; flex: none; display: grid; place-items: center; }
+.toggle { width: 74px; height: 42px; border-radius: 21px; background: rgba(255,255,255,.18); position: relative; flex: none; }
+.toggle b { position: absolute; top: 4px; left: 4px; width: 34px; height: 34px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.4); }
+.toggle .fill { position: absolute; inset: 0; border-radius: 21px; background: #3a7bfd; opacity: 0; }
+.status { position: absolute; display: flex; align-items: center; gap: 14px; padding: 16px 26px; border-radius: 999px; background: #1b1c23; border: 1px solid var(--line-strong); font-size: 26px; font-weight: 700; box-shadow: 0 30px 70px -20px rgba(0,0,0,.9); }
+.status .dot { width: 16px; height: 16px; border-radius: 50%; background: #ff9f43; box-shadow: 0 0 14px #ff9f43; }
+
+/* Laptop + live trackpad gestures */
+.laptop { position: absolute; left: 346px; top: 214px; width: 1228px; }
+.screen { position: relative; width: 1228px; height: 728px; border-radius: 30px; background: #0a0a0c; padding: 14px; box-shadow: 0 0 0 2px #2b2c33, 0 70px 150px -40px rgba(0,0,0,.95); }
+.notch { position: absolute; left: 50%; top: 14px; width: 150px; height: 22px; margin-left: -75px; background: #0a0a0c; border-radius: 0 0 12px 12px; z-index: 9; }
+.deck { position: relative; width: 1400px; margin-left: -86px; height: 22px; border-radius: 0 0 22px 22px; background: linear-gradient(#d7dae2, #8d909a); box-shadow: 0 30px 60px -20px rgba(0,0,0,.8); }
+.deck::after { content: ""; position: absolute; left: 50%; top: 0; width: 200px; height: 8px; margin-left: -100px; border-radius: 0 0 10px 10px; background: rgba(0,0,0,.18); }
+.display { position: relative; width: 1200px; height: 700px; border-radius: 18px; overflow: hidden; background: #0b2433; }
+.strip-wrap { position: absolute; inset: 0; transform-origin: 50% 55%; }
+.strip { position: absolute; top: 0; left: 0; height: 100%; display: flex; gap: 24px; }
+.wins { position: absolute; inset: 0; z-index: 3; }
+.sp { position: relative; width: 1200px; height: 700px; flex: none; overflow: hidden; }
+.wp { position: absolute; inset: 0; background:
+  radial-gradient(ellipse 45% 9% at 72% 47%, rgba(255,255,255,.25), transparent 70%),
+  linear-gradient(180deg, #8cc4ee 0%, #4f9ad6 30%, #2c86c0 41%, #19a1b8 46%, #0f8aa3 60%, #0a6680 80%, #08485e 100%); }
+.wp svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+.mw { position: absolute; border-radius: 14px; background: #1b1c22; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 30px 70px -20px rgba(0,0,0,.75); overflow: hidden; }
+.mw.light { background: #f4f5f8; border-color: rgba(0,0,0,.12); }
+.tb { height: 32px; display: flex; align-items: center; gap: 7px; padding: 0 13px; font-size: 12.5px; font-weight: 600; color: #8f92a3; border-bottom: 1px solid rgba(255,255,255,.06); }
+.mw.light .tb { color: #6b6e7c; border-bottom-color: rgba(0,0,0,.07); background: #eceef2; }
+.tb i { width: 11px; height: 11px; border-radius: 50%; background: #ff5f57; flex: none; }
+.tb i:nth-child(2) { background: #febc2e; } .tb i:nth-child(3) { background: #28c840; margin-right: 8px; }
+.ln { height: 9px; border-radius: 5px; background: rgba(255,255,255,.12); margin: 10px 0; }
+.mw.light .ln { background: rgba(0,0,0,.09); }
+.menubar { position: absolute; top: 0; left: 0; right: 0; height: 26px; display: flex; align-items: center; gap: 18px; padding: 0 18px; font-size: 13px; font-weight: 600; color: #fff; background: rgba(10,20,30,.28); backdrop-filter: blur(10px); z-index: 7; }
+.menubar .right { margin-left: auto; opacity: .9; }
+.dockv { position: absolute; left: 8px; top: 70px; width: 50px; padding: 9px 0; border-radius: 16px; background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.25); backdrop-filter: blur(12px); display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 7; }
+.dockv i { width: 34px; height: 34px; border-radius: 9px; box-shadow: 0 3px 8px rgba(0,0,0,.25); }
+.spacesbar { position: absolute; top: 36px; left: 50%; display: flex; gap: 6px; padding: 5px; border-radius: 13px; background: rgba(12,16,24,.42); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,.14); z-index: 8; }
+.spacesbar span { font-size: 13px; font-weight: 600; color: rgba(255,255,255,.75); padding: 6px 13px; border-radius: 9px; white-space: nowrap; }
+.spacesbar span.on { background: rgba(255,255,255,.3); color: #fff; }
+.mcbar { position: absolute; top: 36px; left: 50%; display: flex; gap: 22px; z-index: 8; }
+.thumb { width: 160px; text-align: center; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.85); }
+.thumb .tv { position: relative; width: 160px; height: 93px; border-radius: 9px; overflow: hidden; border: 2px solid rgba(255,255,255,.15); margin-bottom: 6px; box-shadow: 0 10px 24px -8px rgba(0,0,0,.6); }
+.thumb.on .tv { border-color: #fff; }
+.thumb .tv b { position: absolute; border-radius: 3px; background: #1b1c22; border: 1px solid rgba(255,255,255,.2); }
+.thumb .tv b.light { background: #eef0f4; }
+.files { position: absolute; right: 26px; top: 50px; display: grid; grid-template-columns: repeat(2, 92px); gap: 18px 10px; z-index: 2; }
+.file { text-align: center; font-size: 11px; font-weight: 600; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+.file i { display: block; width: 60px; height: 44px; margin: 0 auto 6px; border-radius: 6px; background: linear-gradient(135deg, #2b2f3d, #4a5168); border: 2px solid #fff; box-shadow: 0 6px 14px -4px rgba(0,0,0,.6); }
+.widget { position: absolute; left: 76px; top: 46px; width: 170px; padding: 14px 16px; border-radius: 20px; background: rgba(30,60,110,.45); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,.25); color: #fff; z-index: 2; }
+.widget b { display: block; font-size: 40px; font-weight: 300; line-height: 1.1; }
+.gesture { position: absolute; left: 50%; top: 984px; display: flex; align-items: center; gap: 16px; padding: 12px 26px 12px 14px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid var(--line-strong); font-size: 26px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.gesture b { color: #fff; padding: 6px 16px; border-radius: 999px; background: var(--brand); font-size: 22px; letter-spacing: .02em; }
+
+/* App window */
+.appwin { display: grid; grid-template-columns: 250px 1fr; height: calc(100% - 64px); }
+.appwin aside { background: #1b1c22; border-right: 1px solid var(--line); padding: 26px 16px; display: flex; flex-direction: column; gap: 8px; }
+.appwin aside span { padding: 13px 18px; border-radius: 14px; font-size: 21px; font-weight: 600; color: #b7b9c6; }
+.appwin aside span.on { background: var(--brand); color: #fff; }
+.appwin main { padding: 32px; }
+.remap { display: flex; align-items: center; gap: 16px; padding: 20px 24px; border-radius: 18px; background: rgba(255,255,255,.04); border: 1px solid var(--line); font-size: 24px; font-weight: 600; margin-bottom: 14px; }
+.remap .c { padding: 7px 16px; border-radius: 999px; background: rgba(255,255,255,.08); font-size: 20px; font-weight: 700; }
+.remap .fx { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+.remap .fx i { width: 40px; height: 40px; border-radius: 11px; background: var(--brand); }
+
+/* CTA */
+.cta-btn { display: inline-flex; align-items: center; gap: 18px; height: 104px; padding: 0 54px; border-radius: 999px; background: #fff; color: #111218; font-size: 38px; font-weight: 800; box-shadow: 0 30px 80px -20px rgba(255,255,255,.45); }
+.cta-btn svg { width: 38px; height: 38px; }
+.url { font-family: "JetBrains Mono", monospace; font-size: 30px; color: #c9cbe0; padding: 14px 28px; border-radius: 16px; background: rgba(255,255,255,.05); border: 1px solid var(--line-strong); }
+
+/* Cursor */
+#cursor { position: absolute; left: 0; top: 0; width: 44px; height: 60px; z-index: 50; pointer-events: none; filter: drop-shadow(0 6px 10px rgba(0,0,0,.6)); }
+#ripple { position: absolute; left: 0; top: 0; width: 90px; height: 90px; margin: -45px 0 0 -45px; border-radius: 50%; border: 4px solid rgba(255,255,255,.85); z-index: 49; opacity: 0; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="body-graphite" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4c4e5c"/><stop offset=".55" stop-color="#1c1d24"/><stop offset="1" stop-color="#0f1015"/></linearGradient>
+    <radialGradient id="spec" cx=".32" cy=".2" r=".55"><stop offset="0" stop-color="#fff" stop-opacity=".42"/><stop offset=".45" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#735cfa"/><stop offset="1" stop-color="#1abdeb"/></linearGradient>
+    <clipPath id="wheelClip"><rect x="91" y="40" width="18" height="48" rx="9"/></clipPath>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+  </defs>
+</svg>
+
+<div id="stage">
+  <div class="layer" id="bg">
+    <div class="glow" id="g1" style="width:900px;height:700px;background:rgba(115,92,250,.28)"></div>
+    <div class="glow" id="g2" style="width:900px;height:700px;background:rgba(26,189,235,.16)"></div>
+  </div>
+  <div id="horizon-wrap"><div id="horizon"></div><div id="horizon-glow"></div></div>
+
+  <!-- S1: the $129 hook -->
+  <section class="scene" id="s1">
+    <div class="center layer" style="gap:0">
+      <div class="kicker" id="s1-kick" style="position:absolute;top:150px">Want trackpad gestures?</div>
+      <div id="s1-pad" style="position:absolute;left:650px;top:360px">
+        <div class="trackpad"></div>
+        <div class="price-tag" id="s1-tag">$129<span class="strike" id="s1-strike"></span></div>
+      </div>
+      <div id="s1-mouse" class="mouse" style="position:absolute;left:470px;top:330px;width:270px"></div>
+      <div id="s1-zero" style="position:absolute;left:880px;top:300px;width:900px">
+        <div class="sub" style="font-size:40px;color:var(--text);font-weight:700;margin-bottom:10px">Your mouse can do it.</div>
+        <div class="zero grad">$0</div>
+        <div class="sub" style="margin-top:20px">with <b style="color:var(--text)">JayceMouse</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- S2: scroll like a trackpad -->
+  <section class="scene" id="s2">
+    <div class="center layer" style="justify-content:flex-start;padding-top:96px">
+      <div class="h2" id="s2-title">Scrolls like a <span class="grad">trackpad.</span></div>
+    </div>
+    <div class="panel" id="s2-raw" style="position:absolute;left:150px;top:300px">
+      <div class="panel-head">Plain mouse wheel <span>steps &amp; jumps</span></div>
+      <div class="viewport"><div class="rows" id="rows-raw"></div></div>
+    </div>
+    <div id="s2-mouse" class="mouse" style="position:absolute;left:840px;top:390px;width:240px"></div>
+    <div class="panel smooth" id="s2-smooth" style="position:absolute;left:1170px;top:300px">
+      <div class="panel-head"><span class="grad" style="font-size:26px;font-weight:700">With JayceMouse</span><span>glides</span></div>
+      <div class="viewport"><div class="rows" id="rows-smooth"></div></div>
+    </div>
+  </section>
+
+  <!-- S3: step 1 download -->
+  <section class="scene" id="s3">
+    <div class="caption" id="s3-cap">
+      <span class="chip"><b>STEP 1</b> 3 steps · under a minute</span>
+      <div class="h2">Download it<br><span class="grad">free.</span></div>
+      <div class="sub">Grab the zip from GitHub and drag the app into Applications.</div>
+    </div>
+    <div class="win" id="s3-win" style="left:960px;top:200px;width:820px;height:480px">
+      <div class="win-bar"><span class="dots"><i></i><i></i><i></i></span>github.com/jaycenguyendev/JayceMouse/releases</div>
+      <div style="padding:30px 34px">
+        <div style="font-size:34px;font-weight:800">JayceMouse v1.0.0 <span style="font-size:20px;padding:5px 12px;border-radius:999px;background:rgba(51,214,158,.15);color:var(--mint);margin-left:10px;vertical-align:middle">Latest</span></div>
+        <div class="asset" id="s3-asset"><span class="zip">ZIP</span>JayceMouse-1.0.0.zip<small>2.1 MB</small></div>
+        <div class="asset dim"><span class="zip" style="background:#3a3c48">SHA</span>JayceMouse-1.0.0.zip.sha256<small>87 B</small></div>
+        <div class="progress"><i id="s3-prog"></i></div>
+      </div>
+    </div>
+    <div class="folder" id="s3-folder" style="left:1250px;top:760px"><div class="back"></div><div class="tab"></div><div class="front">Applications</div></div>
+    <div class="app-icon" id="s3-app" style="left:1290px;top:470px"><i></i></div>
+  </section>
+
+  <!-- S4: step 2 allow -->
+  <section class="scene" id="s4">
+    <div class="caption">
+      <span class="chip"><b>STEP 2</b> one-time</span>
+      <div class="h2">Allow it<br><span class="grad">to open.</span></div>
+      <div class="sub">Click Done, then Open Anyway in Privacy &amp; Security.</div>
+    </div>
+    <div class="dialog" id="s4-dialog" style="left:1100px;top:230px">
+      <div class="ico"></div>
+      <h3>“JayceMouse” Not Opened</h3>
+      <p>Apple could not verify “JayceMouse” is free of malware that may harm your Mac.</p>
+      <span class="dbtn trash">Move to Trash</span>
+      <span class="dbtn" id="s4-done">Done</span>
+    </div>
+    <div class="win" id="s4-set" style="left:930px;top:220px;width:880px;height:560px">
+      <div class="win-bar"><span class="dots"><i></i><i></i><i></i></span>System Settings</div>
+      <div class="settings">
+        <aside><span><i></i>General</span><span><i></i>Accessibility</span><span class="on"><i style="background:#fff"></i>Privacy &amp; Security</span><span><i></i>Desktop &amp; Dock</span></aside>
+        <main>
+          <h4>Security</h4>
+          <div class="sec">
+            <div class="sec-row"><div class="grow">“JayceMouse” was blocked to protect your Mac.</div></div>
+            <div class="sec-row"><div class="grow"><small style="margin:0">Allow apps from App Store &amp; known developers</small></div><span class="btn-os" id="s4-open">Open Anyway<span class="ok" id="s4-ok">✓ Allowed</span></span></div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </section>
+
+  <!-- S5: step 3 accessibility -->
+  <section class="scene" id="s5">
+    <div class="caption">
+      <span class="chip"><b>STEP 3</b> last one</span>
+      <div class="h2">Switch on<br><span class="grad">Accessibility.</span></div>
+      <div class="sub">This lets JayceMouse read your buttons and wheel.</div>
+    </div>
+    <div class="win" id="s5-set" style="left:930px;top:200px;width:880px;height:560px">
+      <div class="win-bar"><span class="dots"><i></i><i></i><i></i></span>Privacy &amp; Security › Accessibility</div>
+      <div style="padding:34px 40px">
+        <div style="font-size:22px;color:var(--muted);margin-bottom:20px">Allow the applications below to control your computer.</div>
+        <div class="sec">
+          <div class="sec-row"><span class="appico" style="background:#e5484d"></span><div class="grow">Raycast</div><span class="toggle"><span class="fill" style="opacity:1"></span><b style="left:36px"></b></span></div>
+          <div class="sec-row"><span class="appico" style="background:var(--brand)"></span><div class="grow">JayceMouse</div><span class="toggle" id="s5-toggle"><span class="fill" id="s5-fill"></span><b id="s5-knob"></b></span></div>
+          <div class="sec-row"><span class="appico" style="background:#2d8cff"></span><div class="grow">Zoom</div><span class="toggle"><b></b></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="status" id="s5-status" style="left:1150px;top:820px"><span class="dot" id="s5-dot"></span><span id="s5-text">Needs access</span></div>
+  </section>
+
+  <!-- S6: key feature — live trackpad gestures on a laptop -->
+  <section class="scene" id="s6">
+    <div class="center layer" style="justify-content:flex-start;padding-top:44px">
+      <span class="chip" id="s6-chip" style="margin-bottom:18px"><b>KEY FEATURE</b> hold the middle button &amp; drag</span>
+      <div class="h2" id="s6-title" style="font-size:68px">Your mouse is now <span class="grad">a trackpad.</span></div>
+    </div>
+    <div class="laptop" id="s6-laptop">
+      <div class="screen">
+        <div class="notch"></div>
+        <div class="display" id="s6-display">
+          <div class="strip-wrap" id="s6-wrap"><div class="strip" id="s6-strip"></div></div>
+          <div class="menubar"><span>&#63743;</span><span id="s6-app">Code</span><span style="opacity:.8">File</span><span style="opacity:.8">Edit</span><span style="opacity:.8">View</span><span style="opacity:.8">Window</span><span class="right">Tue 10 Nov&nbsp;&nbsp;09:41</span></div>
+          <div class="dockv" id="s6-dock"></div>
+          <div class="spacesbar" id="s6-spaces"></div>
+          <div class="mcbar" id="s6-mc"></div>
+        </div>
+      </div>
+      <div class="deck"></div>
+    </div>
+    <div class="gesture" id="s6-gesture"><b id="s6-g-key">Middle + drag →</b><span id="s6-g-text">Previous Space</span></div>
+    <div id="s6-mouse" class="mouse" style="position:absolute;left:1690px;top:660px;width:170px"></div>
+  </section>
+
+  <!-- S7: CTA -->
+  <section class="scene" id="s7">
+    <div class="center layer" style="gap:0">
+      <div class="logo-mark" id="s7-logo" style="margin-bottom:34px"><i></i></div>
+      <div class="h1" id="s7-h">Turn your mouse<br>into a <span class="grad">trackpad.</span></div>
+      <div id="s7-price" style="display:flex;align-items:baseline;gap:26px;margin:24px 0 40px">
+        <span style="font-size:56px;font-weight:700;color:#6b6d7c;text-decoration:line-through;text-decoration-color:var(--pink);text-decoration-thickness:6px">$129</span>
+        <span class="grad" style="font-size:120px;font-weight:800;letter-spacing:-.05em;line-height:1">$0</span>
+        <span class="sub">free &amp; open source</span>
+      </div>
+      <div class="cta-btn" id="s7-btn"><svg viewBox="0 0 24 24"><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M5 19.5h14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Download JayceMouse</div>
+      <div class="url" id="s7-url" style="margin-top:34px">jaycemouse.vercel.app</div>
+    </div>
+  </section>
+
+  <div id="ripple"></div>
+  <svg id="cursor" viewBox="0 0 22 30"><path d="M2 2v22l6-5.5 4 9 3.6-1.6-4-8.9H19z" fill="#fff" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg>
+  <div id="grain"></div>
+  <div id="vignette"></div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, x) => a + (b - a) * x;
+const E = {
+  out: x => 1 - Math.pow(1 - x, 3),
+  out5: x => 1 - Math.pow(1 - x, 5),
+  inOut: x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2,
+  in: x => x * x * x,
+  back: x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); },
+  spring: x => x >= 1 ? 1 : 1 - Math.exp(-6 * x) * Math.cos(9 * x),
+};
+function style(el, { o = 1, x = 0, y = 0, s = 1, r = 0, blur = 0, sx, sy } = {}) {
+  el.style.opacity = o;
+  const scale = sx !== undefined ? `scale(${sx}, ${sy ?? sx})` : `scale(${s})`;
+  el.style.transform = `translate(${x}px, ${y}px) ${scale} rotate(${r}deg)`;
+  el.style.filter = blur > 0.05 ? `blur(${blur}px)` : '';
+}
+// Visibility window for a scene: eased in at `a`, eased out at `b`.
+function windowAt(t, a, b, din = .5, dout = .45) {
+  const i = E.out(prog(t, a, a + din));
+  const o = 1 - E.inOut(prog(t, b - dout, b));
+  return { i, o, v: Math.min(i, o) };
+}
+// Scenes overlap their neighbours slightly, so cuts crossfade instead of dipping to black,
+// while the outgoing scene leaves fast enough that captions in the same spot never smear together.
+const OVERLAP = .12;
+function enterScene(el, t, start, end) {
+  const a = start > 0 ? start - OVERLAP : 0;
+  const b = end < DURATION ? end + OVERLAP : end;
+  const w = windowAt(t, a, b, .5, .3);
+  if (t < a || t > b) { el.style.opacity = 0; el.style.visibility = 'hidden'; return w; }
+  el.style.visibility = 'visible';
+  style(el, { o: w.v, s: lerp(1.04, 1, w.i) * lerp(.97, 1, w.o), blur: (1 - w.i) * 10 + (1 - w.o) * 8, y: (1 - w.i) * 30 });
+  return w;
+}
+
+/* Mouse artwork */
+function mouseSVG() {
+  return `<svg viewBox="0 0 200 300"><defs></defs>
+    <path d="M100 10C152 10 182 48 182 112v86c0 58-36 92-82 92s-82-34-82-92v-86C18 48 48 10 100 10z" fill="url(#body-graphite)"/>
+    <path d="M100 10C152 10 182 48 182 112v86c0 58-36 92-82 92s-82-34-82-92v-86C18 48 48 10 100 10z" fill="url(#spec)"/>
+    <path d="M100 10C152 10 182 48 182 112v86c0 58-36 92-82 92s-82-34-82-92v-86C18 48 48 10 100 10z" fill="none" stroke="url(#rim)" stroke-opacity=".6" stroke-width="1.6"/>
+    <path d="M100 12v108M20 124c26 9 54 13 80 13s54-4 80-13" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="1.6"/>
+    <rect class="g-wheel" x="80" y="28" width="40" height="72" rx="20" fill="url(#rim)" filter="url(#soft)" opacity="0"/>
+    <rect class="g-middle" x="66" y="20" width="68" height="96" rx="34" fill="url(#rim)" filter="url(#soft)" opacity="0"/>
+    <rect x="91" y="40" width="18" height="48" rx="9" fill="#08090c"/>
+    <g clip-path="url(#wheelClip)"><g class="ridges">${[0,1,2,3,4,5,6].map(i => `<rect x="93" y="${28 + i * 12}" width="14" height="3" rx="1.5" fill="#62657a"/>`).join('')}</g></g>
+    <rect x="91" y="40" width="18" height="48" rx="9" fill="none" stroke="url(#rim)" stroke-opacity=".85"/>
+    <rect x="13" y="148" width="9" height="28" rx="4.5" fill="#0c0d11" stroke="url(#rim)" stroke-opacity=".7"/>
+    <rect x="13" y="182" width="9" height="28" rx="4.5" fill="#0c0d11" stroke="url(#rim)" stroke-opacity=".7"/>
+    <g class="arrow" opacity="0" fill="none" stroke="url(#rim)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"></g>
+  </svg><div class="floor"></div>`;
+}
+const mice = {};
+['s1-mouse', 's2-mouse', 's6-mouse'].forEach(id => { $(id).innerHTML = mouseSVG(); mice[id] = $(id); });
+function mouseState(id, { wheel = 0, middle = 0, ridge = 0, arrow = null, arrowO = 0 }) {
+  const m = mice[id];
+  m.querySelector('.g-wheel').setAttribute('opacity', wheel);
+  m.querySelector('.g-middle').setAttribute('opacity', middle);
+  m.querySelector('.ridges').setAttribute('transform', `translate(0 ${-((ridge % 12) + 12) % 12})`);
+  const a = m.querySelector('.arrow');
+  if (arrow && a.dataset.d !== arrow) { a.innerHTML = `<path d="${arrow}"/>`; a.dataset.d = arrow; }
+  a.setAttribute('opacity', arrowO);
+}
+const ARROW_LEFT = 'M-30 150H-120M-90 120l-30 30 30 30';
+const ARROW_UP = 'M100 -20V-110M70 -80l30-30 30 30';
+
+/* Rows */
+const palette = ['#735cfa', '#1abdeb', '#fa5c9e', '#33d69e'];
+const labels = ['Inbox', 'Design review', 'Weekly notes', 'Photos', 'Roadmap', 'Invoices', 'Reading list', 'Travel plans', 'Recipes', 'Music', 'Projects', 'Archive'];
+['rows-raw', 'rows-smooth'].forEach(id => {
+  $(id).innerHTML = Array.from({ length: 30 }, (_, i) => `<div class="row"><i style="background:${palette[i % 4]}"></i>${labels[i % labels.length]}<small>${i + 1}</small></div>`).join('');
+});
+
+/* Laptop desktops for the key-feature scene */
+const MOUNTAINS = `<svg viewBox="0 0 1200 700" preserveAspectRatio="none"><path d="M0 300 L120 250 L210 272 L330 214 L430 258 L560 226 L650 262 L760 236 L860 270 L980 230 L1100 262 L1200 246 V320 H0Z" fill="#dfeaf5" opacity=".8"/><path d="M0 312 L160 290 L300 304 L470 284 L640 300 L820 288 L1000 302 L1200 292 V330 H0Z" fill="#7aa7c7" opacity=".7"/><path d="M820 520 C900 470 1010 470 1080 500 C1130 520 1170 560 1200 560 V700 H760 C780 600 790 545 820 520Z" fill="#5c6f6a" opacity=".75"/><path d="M930 400 l18 -70 l18 70 z M960 410 l14 -52 l14 52z" fill="#244b3c" opacity=".8"/></svg>`;
+const win = (cls, [l, t, w, h], title, body) => `<div class="mw ${cls}" style="left:${l}px;top:${t}px;width:${w}px;height:${h}px"><div class="tb"><i></i><i></i><i></i>${title}</div>${body}</div>`;
+const lines = (n, widths) => Array.from({ length: n }, (_, k) => `<div class="ln" style="width:${widths[k % widths.length]}%"></div>`).join('');
+const codeLines = Array.from({ length: 24 }, (_, k) => {
+  const cols = ['#c792ea', '#82aaff', '#c3e88d', '#f78c6c', '#89ddff', '#9a9cab'];
+  const segs = [14 + (k * 7) % 22, 10 + (k * 13) % 30, 8 + (k * 5) % 18];
+  return `<div style="display:flex;gap:8px;margin:7px 0 7px ${(k % 4) * 18}px">${segs.map((w, j) => `<span style="height:8px;width:${w * 4}px;border-radius:4px;background:${cols[(k + j) % cols.length]};opacity:.75"></span>`).join('')}</div>`;
+}).join('');
+const DESKS = [
+  { app: 'Notes', wins: [['light', [150, 90, 470, 400], 'Notes', `<div style="padding:18px 22px"><div style="font-weight:800;font-size:22px;color:#222;margin-bottom:12px">Launch checklist</div>${lines(9, [90, 70, 80, 55, 85])}</div>`], ['light', [560, 170, 560, 430], 'Mail', `<div style="padding:18px 22px">${lines(12, [95, 60, 85, 70])}</div>`]] },
+  { app: 'Photos', wins: [['', [140, 70, 900, 560], 'Photos', `<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:14px">${Array.from({ length: 15 }, (_, k) => `<div style="height:150px;border-radius:8px;background:linear-gradient(${k * 40}deg, ${['#735cfa', '#1abdeb', '#fa5c9e', '#33d69e', '#f5a35c'][k % 5]}, #1b1c22)"></div>`).join('')}</div>`]] },
+  { app: 'Safari', wins: [['', [120, 100, 620, 540], 'MacLife · Community', `<div style="padding:16px"><div style="height:250px;border-radius:12px;background:radial-gradient(circle at 40% 40%, #dfe5ff, #586292 45%, #1b1c22 80%)"></div>${lines(7, [90, 65, 80])}</div>`], ['', [790, 66, 370, 430], 'Keyboard Shortcuts', `<div style="padding:16px 18px">${Array.from({ length: 7 }, (_, k) => `<div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0"><span class="ln" style="width:55%;margin:0"></span><span style="width:34px;height:20px;border-radius:10px;background:${k % 3 ? '#3a7bfd' : 'rgba(255,255,255,.2)'}"></span></div>`).join('')}</div>`]] },
+  { app: 'Code', wins: [['', [90, 46, 1060, 630], 'JayceMouse — InputEngine.swift', `<div style="display:grid;grid-template-columns:200px 1fr;height:100%"><div style="border-right:1px solid rgba(255,255,255,.06);padding:12px 16px">${lines(14, [80, 60, 70, 50])}</div><div style="padding:14px 22px">${codeLines}</div></div>`]] },
+  { app: 'Clock', wins: [['', [330, 96, 560, 470], 'World Clock&nbsp;&nbsp;·&nbsp;&nbsp;Alarms&nbsp;&nbsp;·&nbsp;&nbsp;<b style="color:#fff">Timers</b>', `<div style="display:grid;place-items:center;height:380px;position:relative"><svg width="300" height="300" viewBox="0 0 300 300" style="position:absolute"><circle cx="150" cy="150" r="128" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="10"/><circle id="s6-ring" cx="150" cy="150" r="128" fill="none" stroke="#ff8a1f" stroke-width="10" stroke-linecap="round" stroke-dasharray="804" transform="rotate(-90 150 150)"/></svg><div id="s6-timer" style="font-size:76px;font-weight:300;color:#fff;font-variant-numeric:tabular-nums">41:02</div></div><div style="display:flex;justify-content:center;gap:16px"><span style="padding:8px 26px;border-radius:999px;background:rgba(255,255,255,.12);font-size:15px;color:#ddd">Cancel</span><span style="padding:8px 26px;border-radius:999px;background:#ff8a1f;font-size:15px;color:#fff;font-weight:700">Pause</span></div>`]] },
+];
+$('s6-strip').innerHTML = DESKS.map((d, k) => `<div class="sp" data-k="${k}"><div class="wp">${MOUNTAINS}</div>${k === 4 ? `<div class="widget" id="s6-widget"><span style="font-size:13px;font-weight:600">Weather</span><b>31°</b><span style="font-size:13px;opacity:.85">Cloudy · H:34° L:26°</span></div><div class="files" id="s6-files">${['Screenshot 09.41', 'Screenshot 09.42', 'Launch notes', 'Logo.png', 'Release.zip', 'Mockups'].map(n => `<div class="file"><i></i>${n}</div>`).join('')}</div>` : ''}<div class="wins">${d.wins.map(w => win(...w)).join('')}</div></div>`).join('');
+$('s6-dock').innerHTML = ['#3a7bfd', '#ff9500', '#34c759', '#af52de', '#ff3b30', '#5ac8fa', '#ffcc00', '#1abdeb', '#735cfa', '#8e8e93'].map(c => `<i style="background:linear-gradient(160deg, ${c}, color-mix(in srgb, ${c} 60%, #000))"></i>`).join('');
+$('s6-spaces').innerHTML = DESKS.map((_, k) => `<span>Desktop ${k + 1}</span>`).join('');
+$('s6-mc').innerHTML = DESKS.map((d, k) => `<div class="thumb"><div class="tv"><div class="wp">${MOUNTAINS}</div>${d.wins.map(([cls, [l, t, w, h]]) => `<b class="${cls}" style="left:${l * .133}px;top:${t * .133}px;width:${w * .133}px;height:${h * .133}px"></b>`).join('')}</div>Desktop ${k + 1}</div>`).join('');
+
+const SW = 1224;
+// Live, finger-following swipes: the desktop tracks the drag, then springs into place on release.
+const SWIPES = [
+  { t0: 16.9, t1: 17.8, from: 3, to: 2 },
+  { t0: 18.15, t1: 18.95, from: 2, to: 3 },
+  { t0: 19.1, t1: 19.9, from: 3, to: 4 },
+  { t0: 24.05, t1: 24.85, from: 4, to: 3 },
+];
+function swipeProgress(x) {
+  return x < .62 ? .74 * E.inOut(x / .62) : .74 + .26 * E.spring((x - .62) / .38);
+}
+function spaceAt(t) {
+  let pos = 3;
+  for (const s of SWIPES) {
+    if (t >= s.t1) { pos = s.to; continue; }
+    if (t >= s.t0) return lerp(s.from, s.to, swipeProgress((t - s.t0) / (s.t1 - s.t0)));
+    break;
+  }
+  return pos;
+}
+const GESTURES = [
+  { a: 16.8, b: 17.95, key: 'Middle + drag →', text: 'Previous Space', arrow: 'right' },
+  { a: 18.05, b: 20.0, key: 'Middle + drag ←', text: 'Next Space', arrow: 'left' },
+  { a: 20.1, b: 21.75, key: 'Hold middle', text: 'Show Desktop', arrow: null },
+  { a: 21.9, b: 23.9, key: 'Middle + drag ↑', text: 'Mission Control', arrow: 'up' },
+  { a: 23.95, b: 25.1, key: 'Middle + drag →', text: 'Previous Space', arrow: 'right' },
+];
+const ARROW_RIGHT = 'M230 150H320M290 120l30 30-30 30';
+const ARROWS = { left: ARROW_LEFT, right: ARROW_RIGHT, up: ARROW_UP };
+
+/* Deterministic scroll simulation (same exponential glide as the app) */
+function simulate(ticks, perTick, tau) {
+  const dt = 1 / 480, t0 = ticks[0] - .01, t1 = ticks[ticks.length - 1] + 3;
+  const ys = []; let y = 0, v = 0, k = 0;
+  for (let t = t0; t <= t1; t += dt) {
+    while (k < ticks.length && ticks[k] <= t) { if (tau === 0) y += perTick; else v += perTick / tau; k++; }
+    if (tau > 0) { const d = Math.exp(-dt / tau); y += v * tau * (1 - d); v *= d; }
+    ys.push(y);
+  }
+  return t => t <= t0 ? 0 : ys[Math.min(ys.length - 1, Math.floor((t - t0) / dt))];
+}
+const S2_TICKS = [4.35, 4.5, 4.65, 4.8, 4.95, 5.55, 5.7, 5.85, 6.0];
+const rawY = simulate(S2_TICKS, 90, 0);
+const smoothY = simulate(S2_TICKS, 90, .32);
+
+/* Cursor */
+let targets = {};
+function measure() {
+  const pick = (id, dx = 0, dy = 0) => { const r = $(id).getBoundingClientRect(); return [r.left + r.width / 2 + dx, r.top + r.height / 2 + dy]; };
+  document.querySelectorAll('.scene').forEach(s => { s.style.opacity = 1; s.style.visibility = 'visible'; s.style.transform = 'none'; });
+  targets = {
+    asset: pick('s3-asset', -120, 0), done: pick('s4-done'), open: pick('s4-open'), toggle: pick('s5-toggle'), cta: pick('s7-btn', -40, 10),
+  };
+}
+const CURSOR = [
+  // [time, x, y]  (null x hides the cursor)
+  [7.0, 1900, 1000, 0], [7.35, 1880, 960, 1], [8.0, 'asset', 0, 1], [9.2, 'asset', 0, 1], [9.5, 1880, 1020, 0],
+  [10.0, 1880, 1020, 0], [10.2, 1860, 980, 1], [10.85, 'done', 0, 1], [11.6, 'done', 0, 1], [12.0, 'open', 0, 1], [12.75, 'open', 0, 1], [13.0, 1880, 1020, 0],
+  [13.5, 1880, 1020, 0], [13.7, 1860, 980, 1], [14.3, 'toggle', 0, 1], [15.4, 'toggle', 0, 1], [15.8, 1880, 1020, 0],
+  [26.9, 1880, 1040, 0], [27.1, 1860, 1000, 1], [27.9, 'cta', 0, 1], [29.0, 'cta', 0, 1], [29.4, 'cta', 0, 0],
+];
+const CLICKS = [8.05, 10.9, 12.45, 14.35, 27.95];
+function cursorAt(t) {
+  const pt = k => { const [, x, y] = CURSOR[k]; return typeof x === 'string' ? targets[x] : [x, y]; };
+  if (t <= CURSOR[0][0] || t >= CURSOR[CURSOR.length - 1][0]) return null;
+  let k = 0; while (k < CURSOR.length - 2 && CURSOR[k + 1][0] <= t) k++;
+  const [ta, , , oa] = CURSOR[k], [tb, , , ob] = CURSOR[k + 1];
+  const x = E.inOut(prog(t, ta, tb));
+  const a = pt(k), b = pt(k + 1);
+  // Gentle arc so the pointer travels like a hand, not a ruler.
+  const arc = Math.sin(x * Math.PI) * Math.min(80, Math.hypot(b[0] - a[0], b[1] - a[1]) * .12);
+  return { x: lerp(a[0], b[0], x), y: lerp(a[1], b[1], x) - arc, o: lerp(oa, ob, x) };
+}
+function pressAt(t) { let s = 0; for (const c of CLICKS) s = Math.max(s, 1 - Math.abs(t - c) / .08); return clamp(s); }
+
+/* Sound effect cue sheet, consumed by audio.py */
+window.SFX = [
+  { t: 0.15, type: 'whoosh', gain: .55 },
+  { t: 0.55, type: 'pop', gain: .7 },
+  { t: 1.45, type: 'swipe', gain: .7 },
+  { t: 2.0, type: 'whoosh', gain: .7 },
+  { t: 2.45, type: 'impact', gain: .85 },
+  { t: 2.5, type: 'shimmer', gain: .45 },
+  { t: 3.45, type: 'whoosh', gain: .5 },
+  ...S2_TICKS.map(t => ({ t, type: 'tick', gain: .55 })),
+  { t: 6.95, type: 'whoosh', gain: .5 },
+  { t: 8.05, type: 'click', gain: .9 },
+  { t: 8.75, type: 'whoosh', gain: .45 },
+  { t: 9.15, type: 'drop', gain: .8 },
+  { t: 9.95, type: 'whoosh', gain: .45 },
+  { t: 10.9, type: 'click', gain: .9 },
+  { t: 12.45, type: 'click', gain: .9 },
+  { t: 12.55, type: 'success', gain: .6 },
+  { t: 13.45, type: 'whoosh', gain: .45 },
+  { t: 14.35, type: 'toggle', gain: .9 },
+  { t: 14.9, type: 'success', gain: .7 },
+  { t: 15.9, type: 'whoosh', gain: .5 },
+  ...SWIPES.flatMap(sw => [{ t: sw.t0 + .04, type: 'swoosh', gain: .75 }, { t: sw.t0 + .6, type: 'tick', gain: .4 }]),
+  { t: 20.2, type: 'whoosh', gain: .6 },
+  { t: 20.7, type: 'pop', gain: .35 },
+  { t: 21.25, type: 'whoosh', gain: .45 },
+  { t: 22.0, type: 'swoosh-up', gain: .8 },
+  { t: 22.55, type: 'tick', gain: .4 },
+  { t: 23.35, type: 'whoosh', gain: .45 },
+  { t: 24.0, type: 'riser', gain: .7 },
+  { t: 25.5, type: 'impact', gain: 1 },
+  { t: 25.55, type: 'shimmer', gain: .6 },
+  { t: 27.95, type: 'click', gain: .9 },
+  { t: 28.0, type: 'success', gain: .55 },
+];
+
+/* Scene timing */
+const T = { s1: [0, 3.5], s2: [3.5, 7.0], s3: [7.0, 10.0], s4: [10.0, 13.5], s5: [13.5, 16.0], s6: [16.0, 25.5], s7: [25.5, 30.0] };
+const DURATION = 30;
+
+function renderAt(t) {
+  // Background drift
+  style($('g1'), { x: 1100 + Math.sin(t * .35) * 120, y: -200 + Math.cos(t * .27) * 80 });
+  style($('g2'), { x: -150 + Math.cos(t * .3) * 120, y: 520 + Math.sin(t * .22) * 90 });
+  $('grain').style.transform = `translate(${(Math.floor(t * 24) * 37) % 300 - 150}px, ${(Math.floor(t * 24) * 53) % 300 - 150}px)`;
+
+  // Horizon: rises in the intro, rests low, returns bright for the CTA
+  const hIntro = E.out(prog(t, 0, 1.4)), hOut = E.inOut(prog(t, 3.0, 3.6)), hCta = E.out(prog(t, 25.3, 26.6));
+  const hy = lerp(lerp(1400, 760, hIntro), 1300, hOut * (1 - hCta)) * (1 - hCta) + 690 * hCta;
+  $('horizon').style.top = hy + 'px';
+  $('horizon-glow').style.top = (hy - 220) + 'px';
+  $('horizon-wrap').style.opacity = clamp(hIntro * (1 - hOut) + hCta) * (1 - E.inOut(prog(t, 29.4, 30)));
+
+  // S1 — the $129 hook
+  {
+    const el = $('s1'); const w = enterScene(el, t, ...T.s1);
+    if (el.style.visibility === 'visible') {
+      style($('s1-kick'), { o: E.out(prog(t, .2, .7)), y: (1 - E.out(prog(t, .2, .8))) * 30 });
+      const padIn = E.out5(prog(t, .1, .9)), padOut = E.inOut(prog(t, 1.85, 2.35));
+      style($('s1-pad'), { o: padIn * (1 - padOut), y: (1 - padIn) * 200 - padOut * 40, x: -padOut * 260, s: lerp(.92, 1, padIn) * lerp(1, .7, padOut), r: lerp(4, 0, padIn) - padOut * 8, blur: padOut * 10 });
+      style($('s1-tag'), { o: prog(t, .5, .6), s: E.back(prog(t, .5, .85)), r: -6 });
+      $('s1-strike').style.transform = `scaleX(${E.out(prog(t, 1.4, 1.7))}) rotate(-8deg)`;
+      const mIn = E.out5(prog(t, 1.95, 2.6));
+      style($('s1-mouse'), { o: mIn, x: (1 - mIn) * -400, y: Math.sin(t * 2.4) * 10, r: lerp(-30, -14, mIn), s: lerp(.8, 1, mIn) });
+      mouseState('s1-mouse', { wheel: .9 * E.out(prog(t, 2.4, 2.8)), ridge: t * 30 });
+      const zIn = E.back(prog(t, 2.35, 2.85));
+      style($('s1-zero'), { o: prog(t, 2.3, 2.5), x: (1 - E.out(prog(t, 2.3, 2.8))) * 80, s: lerp(.85, 1, zIn) });
+    }
+  }
+
+  // S2 — scroll compare
+  {
+    const el = $('s2'); enterScene(el, t, ...T.s2);
+    if (el.style.visibility === 'visible') {
+      style($('s2-title'), { o: E.out(prog(t, 3.6, 4.1)), y: (1 - E.out(prog(t, 3.6, 4.2))) * 30 });
+      style($('s2-raw'), { o: E.out(prog(t, 3.75, 4.2)), y: (1 - E.out(prog(t, 3.75, 4.3))) * 60 });
+      style($('s2-smooth'), { o: E.out(prog(t, 3.9, 4.35)), y: (1 - E.out(prog(t, 3.9, 4.45))) * 60 });
+      $('rows-raw').style.transform = `translateY(${-rawY(t)}px)`;
+      $('rows-smooth').style.transform = `translateY(${-smoothY(t)}px)`;
+      const mIn = E.back(prog(t, 4.0, 4.5));
+      style($('s2-mouse'), { o: prog(t, 4.0, 4.2), s: lerp(.6, 1, mIn), y: Math.sin(t * 2.2) * 8, r: -10 });
+      const near = Math.max(...S2_TICKS.map(k => 1 - Math.abs(t - k) / .25));
+      mouseState('s2-mouse', { wheel: clamp(.25 + near), ridge: smoothY(t) * .25 });
+    }
+  }
+
+  // S3 — download
+  {
+    const el = $('s3'); enterScene(el, t, ...T.s3);
+    if (el.style.visibility === 'visible') {
+      style($('s3-win'), { o: E.out(prog(t, 7.1, 7.6)), y: (1 - E.out(prog(t, 7.1, 7.7))) * 60 });
+      const pressed = pressAt(t);
+      $('s3-asset').style.background = t > 8.05 ? 'rgba(115,92,250,.16)' : 'rgba(255,255,255,.02)';
+      $('s3-asset').style.borderColor = t > 8.05 ? 'rgba(115,92,250,.6)' : '';
+      $('s3-asset').style.transform = `scale(${1 - pressed * .02})`;
+      $('s3-prog').style.width = (E.inOut(prog(t, 8.1, 8.7)) * 100) + '%';
+      const fIn = E.out(prog(t, 8.6, 9.0));
+      style($('s3-folder'), { o: fIn, y: (1 - fIn) * 40 });
+      const fly = E.inOut(prog(t, 8.7, 9.15));
+      const appO = prog(t, 8.65, 8.8) * (1 - prog(t, 9.15, 9.25));
+      style($('s3-app'), { o: appO, x: lerp(-60, 0, fly), y: lerp(-60, 310, fly) + Math.sin(fly * Math.PI) * -90, s: lerp(.9, .5, fly) });
+      const bump = Math.sin(clamp((t - 9.15) / .3) * Math.PI) * .08;
+      style($('s3-folder'), { o: fIn, y: (1 - fIn) * 40, s: 1 + bump });
+    }
+  }
+
+  // S4 — allow
+  {
+    const el = $('s4'); enterScene(el, t, ...T.s4);
+    if (el.style.visibility === 'visible') {
+      const dIn = E.back(prog(t, 10.15, 10.6)), dOut = E.in(prog(t, 10.95, 11.25));
+      style($('s4-dialog'), { o: prog(t, 10.15, 10.3) * (1 - dOut), s: lerp(.85, 1, dIn) * lerp(1, .9, dOut) });
+      $('s4-done').style.background = t > 10.86 && t < 11.0 ? 'rgba(255,255,255,.28)' : '';
+      const sIn = E.out(prog(t, 11.2, 11.7));
+      style($('s4-set'), { o: sIn, y: (1 - sIn) * 60 });
+      const ok = E.out(prog(t, 12.48, 12.7));
+      $('s4-ok').style.opacity = ok;
+      $('s4-open').style.transform = `scale(${1 - pressAt(t) * .05 + Math.sin(clamp((t - 12.48) / .35) * Math.PI) * .06})`;
+    }
+  }
+
+  // S5 — accessibility
+  {
+    const el = $('s5'); enterScene(el, t, ...T.s5);
+    if (el.style.visibility === 'visible') {
+      const sIn = E.out(prog(t, 13.6, 14.1));
+      style($('s5-set'), { o: sIn, y: (1 - sIn) * 60 });
+      const on = E.out(prog(t, 14.36, 14.55));
+      $('s5-knob').style.left = lerp(4, 36, on) + 'px';
+      $('s5-fill').style.opacity = on;
+      const stIn = E.back(prog(t, 14.0, 14.4));
+      style($('s5-status'), { o: prog(t, 14.0, 14.15), s: lerp(.8, 1, stIn) + Math.sin(clamp((t - 14.9) / .35) * Math.PI) * .08 });
+      const active = t >= 14.9;
+      $('s5-dot').style.background = active ? 'var(--mint)' : '#ff9f43';
+      $('s5-dot').style.boxShadow = active ? '0 0 14px var(--mint)' : '0 0 14px #ff9f43';
+      $('s5-text').textContent = active ? 'Active — you’re all set' : 'Needs access';
+    }
+  }
+
+  // S6 — key feature: live trackpad gestures
+  {
+    const el = $('s6'); enterScene(el, t, ...T.s6);
+    if (el.style.visibility === 'visible') {
+      style($('s6-chip'), { o: E.out(prog(t, 16.05, 16.45)), y: (1 - E.out(prog(t, 16.05, 16.5))) * 20 });
+      style($('s6-title'), { o: E.out(prog(t, 16.15, 16.6)), y: (1 - E.out(prog(t, 16.15, 16.7))) * 30 });
+      const lIn = E.out5(prog(t, 16.0, 16.8));
+      style($('s6-laptop'), { o: lIn, y: (1 - lIn) * 120, s: lerp(.94, 1, lIn) });
+
+      const pos = spaceAt(t);
+      $('s6-strip').style.transform = `translateX(${-pos * SW}px)`;
+      $('s6-app').textContent = DESKS[Math.round(pos)].app;
+
+      const swiping = SWIPES.reduce((m, sw) => Math.max(m, clamp(prog(t, sw.t0 - .05, sw.t0 + .1)) * (1 - clamp(prog(t, sw.t1 + .25, sw.t1 + .5)))), 0);
+      const mc = E.inOut(prog(t, 22.0, 22.55)) * (1 - E.inOut(prog(t, 23.35, 23.8)));
+      const sb = $('s6-spaces');
+      sb.style.opacity = swiping * (1 - mc);
+      sb.style.transform = `translate(-50%, ${(1 - swiping) * -14}px)`;
+      [...sb.children].forEach((c, k) => c.classList.toggle('on', Math.round(pos) === k));
+
+      // Show Desktop: windows part to the edges and reveal the desktop.
+      const sd = E.inOut(prog(t, 20.2, 20.7)) * (1 - E.inOut(prog(t, 21.25, 21.65)));
+      const wins = document.querySelectorAll('#s6-strip .sp')[4].querySelector('.wins');
+      style(wins, { x: sd * 600, y: sd * 430, s: 1 + sd * .06, o: 1 - sd * .1 });
+      style($('s6-files'), { o: sd, s: lerp(.92, 1, sd) });
+      style($('s6-widget'), { o: sd, s: lerp(.92, 1, sd), y: (1 - sd) * -10 });
+
+      // Mission Control: the desktop shrinks and the Spaces bar opens into thumbnails.
+      style($('s6-wrap'), { s: 1 - mc * .3, y: mc * 50 });
+      document.querySelectorAll('#s6-strip .sp').forEach((d, k) => { d.style.opacity = k === Math.round(pos) ? 1 : 1 - mc; });
+      $('s6-wrap').style.filter = `brightness(${1 - mc * .25})`;
+      $('s6-display').style.background = mc > 0 ? `rgb(${lerp(11, 16, mc)},${lerp(36, 28, mc)},${lerp(51, 40, mc)})` : '';
+      const bar = $('s6-mc');
+      bar.style.opacity = mc;
+      bar.style.transform = `translate(-50%, ${(1 - mc) * -130}px)`;
+      [...bar.children].forEach((c, k) => c.classList.toggle('on', Math.round(pos) === k));
+
+      // Timer keeps running, which sells "this is a live desktop".
+      const left = 41 * 60 + 2 - Math.floor(t - 16);
+      $('s6-timer').textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
+      $('s6-ring').setAttribute('stroke-dashoffset', String(804 * (1 - left / 3600)));
+
+      // Gesture label + mouse
+      const g = GESTURES.find(g => t >= g.a && t < g.b);
+      const gA = g ? clamp(prog(t, g.a, g.a + .15)) * (1 - clamp(prog(t, g.b - .15, g.b))) : 0;
+      if (g) { $('s6-g-key').textContent = g.key; $('s6-g-text').textContent = g.text; }
+      style($('s6-gesture'), { o: gA, x: -$('s6-gesture').offsetWidth / 2, y: (1 - gA) * 12 });
+      const mIn = E.back(prog(t, 16.4, 16.85));
+      let mx = 0, my = 0;
+      for (const sw of SWIPES) { const k = Math.sin(clamp(prog(t, sw.t0, sw.t1)) * Math.PI) * 35; mx += (sw.to < sw.from ? 1 : -1) * k; }
+      my -= Math.sin(clamp(prog(t, 21.95, 22.6)) * Math.PI) * 50;
+      style($('s6-mouse'), { o: prog(t, 16.4, 16.55), s: lerp(.6, 1, mIn), x: mx, y: my + Math.sin(t * 2) * 6, r: -10 });
+      mouseState('s6-mouse', { middle: gA, arrow: g && g.arrow ? ARROWS[g.arrow] : null, arrowO: g && g.arrow ? gA * (.65 + .35 * Math.sin(t * 9)) : 0 });
+    }
+  }
+
+  // S7 — CTA
+  {
+    const el = $('s7'); const w = enterScene(el, t, ...T.s7);
+    if (el.style.visibility === 'visible') {
+      const u = t - 2;
+      const lIn = E.spring(prog(u, 23.5, 24.4));
+      style($('s7-logo'), { o: prog(u, 23.5, 23.65), s: lerp(.3, 1, lIn), r: lerp(-20, 0, E.out(prog(u, 23.5, 24.1))) });
+      style($('s7-h'), { o: E.out(prog(u, 23.75, 24.2)), y: (1 - E.out(prog(u, 23.75, 24.3))) * 40 });
+      style($('s7-price'), { o: E.out(prog(u, 24.15, 24.5)), s: lerp(.9, 1, E.back(prog(u, 24.15, 24.6))) });
+      const pulse = u > 25 ? Math.sin((u - 25) * Math.PI * 1.6) * .02 : 0;
+      style($('s7-btn'), { o: E.out(prog(u, 24.5, 24.85)), y: (1 - E.out(prog(u, 24.5, 24.95))) * 30, s: 1 + pulse - pressAt(t) * .05 });
+      style($('s7-url'), { o: E.out(prog(u, 24.8, 25.2)) });
+      const fade = 1 - E.inOut(prog(u, 27.4, 28));
+      el.style.opacity = Math.min(w.i, fade);
+    }
+  }
+
+  // Cursor & click ripple
+  const c = cursorAt(t);
+  const cur = $('cursor');
+  if (!c || c.o <= 0.01) { cur.style.opacity = 0; }
+  else {
+    const press = pressAt(t);
+    cur.style.opacity = c.o;
+    cur.style.transform = `translate(${c.x - 6}px, ${c.y - 4}px) scale(${1 - press * .15})`;
+  }
+  let rip = 0, rx = 0, ry = 0;
+  for (const k of CLICKS) { const d = t - k; if (d >= 0 && d < .45) { rip = d / .45; const p = cursorAt(k); if (p) { rx = p.x; ry = p.y; } } }
+  const r = $('ripple');
+  r.style.opacity = rip ? (1 - rip) * .9 : 0;
+  r.style.transform = `translate(${rx}px, ${ry}px) scale(${.3 + rip * 1.1})`;
+}
+
+window.DURATION = DURATION;
+window.renderAt = renderAt;
+window.ready = document.fonts.ready.then(() => { measure(); renderAt(0); return true; });
+</script>
+</body>
+</html>

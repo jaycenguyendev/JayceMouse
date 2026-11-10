@@ -1,5 +1,11 @@
 # JayceMouse
 
+**Turn any mouse into a trackpad — for $0.** Smooth scrolling, trackpad-style gestures and fully custom buttons for macOS.
+
+[**Website**](https://jaycemouse.vercel.app/) · [**Download**](../../releases/latest) · [**Watch the 30-second demo**](https://jaycemouse.vercel.app/#watch)
+
+[![JayceMouse launch video — click to watch](docs/media/jaycemouse-launch-poster.jpg)](https://jaycemouse.vercel.app/#watch)
+
 A modern macOS mouse enhancer inspired by [Mac Mouse Fix](https://github.com/noah-nuebling/mac-mouse-fix) by Noah Nuebling.
 Independent implementation written from scratch (SwiftUI + CGEventTap); it shares no code or assets with Mac Mouse Fix and has no licensing/trial system.
 

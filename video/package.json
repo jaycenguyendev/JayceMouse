@@ -1,0 +1,12 @@
+{
+  "name": "jaycemouse-launch-video",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "render": "node render.mjs",
+    "stills": "node render.mjs --stills"
+  },
+  "dependencies": {
+    "puppeteer-core": "25.16.0"
+  }
+}
