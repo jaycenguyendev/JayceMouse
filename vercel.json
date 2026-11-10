@@ -4,5 +4,12 @@
   "buildCommand": "",
   "installCommand": "",
   "outputDirectory": "docs",
-  "cleanUrls": true
+  "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/download",
+      "destination": "https://github.com/jaycenguyendev/JayceMouse/releases/download/v1.0.0/JayceMouse-1.0.0.zip",
+      "permanent": false
+    }
+  ]
 }

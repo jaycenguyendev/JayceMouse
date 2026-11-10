@@ -2,7 +2,7 @@
 
 **Turn any mouse into a trackpad — for $0.** Smooth scrolling, trackpad-style gestures and fully custom buttons for macOS.
 
-[**Website**](https://jaycemouse.vercel.app/) · [**Download**](../../releases/latest) · [**Watch the 30-second demo**](https://jaycemouse.vercel.app/#watch)
+[**Website**](https://jaycemouse.vercel.app/) · [**Download**](https://jaycemouse.vercel.app/download) · [**Watch the 30-second demo**](https://jaycemouse.vercel.app/#watch)
 
 [![JayceMouse launch video — click to watch](docs/media/jaycemouse-launch-poster.jpg)](https://jaycemouse.vercel.app/#watch)
 
@@ -12,7 +12,7 @@ Independent implementation written from scratch (SwiftUI + CGEventTap); it share
 ## Install
 Requires macOS 14 or later (Apple Silicon and Intel).
 
-1. Download `JayceMouse-<version>.zip` from the [latest release](../../releases/latest) and unzip it.
+1. [Download the latest zip](https://jaycemouse.vercel.app/download) (or pick a version from [Releases](../../releases)) and unzip it.
 2. Drag **JayceMouse.app** into your **Applications** folder.
 3. The app is not notarized by Apple, so macOS blocks the first launch with a message like
    *"JayceMouse" Not Opened — Apple could not verify "JayceMouse" is free of malware*.
