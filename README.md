@@ -8,9 +8,13 @@ Requires macOS 14 or later (Apple Silicon and Intel).
 
 1. Download `JayceMouse-<version>.zip` from the [latest release](../../releases/latest) and unzip it.
 2. Drag **JayceMouse.app** into your **Applications** folder.
-3. The app is not notarized by Apple, so macOS blocks the first launch. Allow it once, using either way:
-   - Open the app, then go to **System Settings → Privacy & Security**, scroll down and click **Open Anyway**.
-   - Or run this in Terminal and open the app normally:
+3. The app is not notarized by Apple, so macOS blocks the first launch with a message like
+   *"JayceMouse" Not Opened — Apple could not verify "JayceMouse" is free of malware*.
+   **Do not click "Move to Trash"** (click **Done**) and allow the app once, using either way:
+   - **System Settings → Privacy & Security**, scroll down to the Security section and click **Open Anyway** next to
+     *"JayceMouse" was blocked*, then confirm with your password or Touch ID. The button only appears after you have
+     tried to open the app once. On macOS 15 and later, right-click → Open no longer bypasses this.
+   - Or run this in Terminal (it removes the download quarantine flag) and open the app normally:
      ```bash
      xattr -dr com.apple.quarantine /Applications/JayceMouse.app
      ```
