@@ -33,12 +33,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 .sink { [weak self] show in self?.setMenuBarItem(visible: show) }
                 .store(in: &cancellables)
         }
+        #if DEBUG
         E2E.launchIfRequested()
         if let directory = ProcessInfo.processInfo.environment["JAYCEMOUSE_SNAPSHOT_DIR"] {
             snapshotPages(into: directory)
         }
+        #else
+        DebugLog.removeStaleLog()
+        #endif
     }
 
+    #if DEBUG
     private func snapshotPages(into directory: String) {
         let pages = ["overview", "buttons", "scroll", "pointer", "general", "about"]
         try? FileManager.default.createDirectory(atPath: directory, withIntermediateDirectories: true)
@@ -56,6 +61,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { capture(0) }
     }
+    #endif
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 

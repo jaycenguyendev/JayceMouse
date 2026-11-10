@@ -56,5 +56,9 @@ EOF
 
 KEYCHAIN_ARGS=()
 if [ -n "${SIGN_KEYCHAIN:-}" ]; then KEYCHAIN_ARGS=(--keychain "$SIGN_KEYCHAIN"); fi
-codesign --force --deep --sign "$IDENTITY" ${KEYCHAIN_ARGS[@]+"${KEYCHAIN_ARGS[@]}"} --identifier app.jaycemouse.JayceMouse "$APP"
+# Hardened runtime blocks DYLD_INSERT_LIBRARIES, so injected code can't borrow the Accessibility grant.
+# Debug bundles skip it so lldb can still attach.
+RUNTIME_ARGS=()
+if [ "$CONFIG" = "release" ]; then RUNTIME_ARGS=(--options runtime); fi
+codesign --force ${RUNTIME_ARGS[@]+"${RUNTIME_ARGS[@]}"} --sign "$IDENTITY" ${KEYCHAIN_ARGS[@]+"${KEYCHAIN_ARGS[@]}"} --identifier app.jaycemouse.JayceMouse "$APP"
 echo "Built $APP (signed with: ${IDENTITY/-/ad-hoc})"

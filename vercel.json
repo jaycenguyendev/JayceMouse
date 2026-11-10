@@ -8,7 +8,7 @@
   "redirects": [
     {
       "source": "/download",
-      "destination": "https://github.com/jaycenguyendev/JayceMouse/releases/download/v1.0.0/JayceMouse-1.0.0.zip",
+      "destination": "https://github.com/jaycenguyendev/JayceMouse/releases/latest/download/JayceMouse.zip",
       "permanent": false
     }
   ]
