@@ -342,6 +342,13 @@ details code { font-family: "JetBrains Mono", monospace; font-size: 13px; backgr
 .cta h2 { font-size: clamp(30px, 4.6vw, 50px); letter-spacing: -.03em; line-height: 1.08; margin: 0 0 14px; font-weight: 800; }
 .cta p { color: var(--muted); margin: 0 0 30px; }
 .cta .hero-ctas { justify-content: center; }
+.support { max-width: 820px; margin: 0 auto; display: flex; align-items: center; gap: 40px; padding: 32px; border-radius: var(--radius-xl); border: 1px solid var(--line-strong); background: linear-gradient(180deg, #181922, #111218); }
+.support-qr { flex: none; width: 200px; padding: 14px; border-radius: 18px; background: #fff; }
+.support-qr img { display: block; width: 100%; height: auto; }
+.support h2 { font-size: clamp(26px, 3.4vw, 36px); letter-spacing: -.025em; line-height: 1.1; margin: 10px 0 12px; font-weight: 800; }
+.support p { color: var(--muted); margin: 0 0 10px; }
+.support small { color: var(--faint); font-size: 13px; }
+@media (max-width: 680px) { .support { flex-direction: column; text-align: center; gap: 24px; padding: 28px 20px; } }
 footer { padding: 56px 0 48px; color: var(--faint); font-size: 13.5px; }
 footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: center; }
 footer nav { display: flex; gap: 20px; flex-wrap: wrap; }
@@ -794,6 +801,20 @@ footer a:hover { color: var(--text); }
     </div>
   </section>
 
+  <section class="section" id="support">
+    <div class="wrap">
+      <div class="support reveal">
+        <div class="support-qr"><img src="media/donate-qr.png" width="616" height="616" alt="Napas 247 QR code to buy the developer a coffee" loading="lazy"></div>
+        <div>
+          <span class="eyebrow">Support</span>
+          <h2>Buy me a <span class="grad-text">coffee.</span> ☕</h2>
+          <p>JayceMouse is free and always will be. If it made your mouse feel better, a coffee keeps the updates coming.</p>
+          <small>Scan with any Vietnamese banking app (Napas 247 / VietQR).</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="section">
     <div class="wrap">
       <div class="cta reveal">
@@ -816,6 +837,7 @@ footer a:hover { color: var(--text); }
       <a href="https://github.com/jaycenguyendev/JayceMouse/releases">Releases</a>
       <a href="https://github.com/jaycenguyendev/JayceMouse/blob/main/LICENSE">MIT License</a>
       <a href="https://github.com/jaycenguyendev/JayceMouse/issues">Report an issue</a>
+      <a href="#support">Buy me a coffee</a>
     </nav>
     <span>Inspired by Mac Mouse Fix. Not affiliated with Apple.</span>
   </div>

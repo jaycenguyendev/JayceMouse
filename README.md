@@ -28,7 +28,11 @@ Requires macOS 14 or later (Apple Silicon and Intel).
 
 Updating: replace the app with the new version. Because releases are ad-hoc signed, macOS forgets the Accessibility permission after an update. Remove JayceMouse from the Accessibility list with the minus button, then add it back (or toggle it off and on).
 
-Check the download with `shasum -a 256 -c JayceMouse-<version>.zip.sha256` if you like.
+To confirm the zip was built by this repository's release workflow (and not tampered with), run, with the [GitHub CLI](https://cli.github.com/):
+```bash
+gh attestation verify JayceMouse.zip --repo jaycenguyendev/JayceMouse
+```
+Releases from v1.0.1 on carry this attestation. The `.sha256` files next to each zip only catch a corrupted download.
 
 ## Features
 - **Smooth scrolling**: off / low / regular / high, speed low/medium/high with tick acceleration, natural direction, trackpad-style scroll phases.
@@ -38,6 +42,14 @@ Check the download with `shasum -a 256 -c JayceMouse-<version>.zip.sha256` if yo
 - **Gestures**: Desktop & Launchpad scroll, Scroll & Navigate (two-finger swipe), Spaces & Mission Control (three-finger swipe), scroll to switch Spaces / zoom.
 - **Pointer**: sensitivity and acceleration via the system HID acceleration setting (restored on quit).
 - **General**: menu bar item, launch at login, kill switches, lock pointer during drag, 3-/5-button presets.
+
+## Support
+JayceMouse is free and always will be. If it made your mouse feel better, you can buy me a coffee ☕ by scanning this
+code with any Vietnamese banking app (Napas 247 / VietQR):
+
+<img src="docs/media/donate-qr.png" width="200" alt="Napas 247 QR code to buy the developer a coffee">
+
+Starring the repo and [reporting issues](../../issues) helps too.
 
 ## Build from source
 Requires Swift 6 toolchain (Command Line Tools are enough; Xcode is not required).

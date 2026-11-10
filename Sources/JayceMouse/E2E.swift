@@ -1,9 +1,10 @@
+#if DEBUG
 import AppKit
 import JayceMouseCore
 
 /// End-to-end self test: injects synthetic mouse/keyboard events at the HID level, lets the real
 /// event tap and remap engine process them, and records what comes out the other side.
-/// Run with: open -n build/JayceMouse.app --args --e2e /path/to/report.txt
+/// Debug builds only. Run with: CONFIG=debug Scripts/build-app.sh && open -n build/JayceMouse.app --args --e2e /path/to/report.txt
 enum E2E {
     static let testTag: Int64 = 0x7E57
 
@@ -469,3 +470,4 @@ enum E2E {
         finish()
     }
 }
+#endif
