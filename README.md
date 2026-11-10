@@ -43,6 +43,14 @@ Releases from v1.0.1 on carry this attestation. The `.sha256` files next to each
 - **Pointer**: sensitivity and acceleration via the system HID acceleration setting (restored on quit).
 - **General**: menu bar item, launch at login, kill switches, lock pointer during drag, 3-/5-button presets.
 
+## Support
+JayceMouse is free and always will be. If it made your mouse feel better, you can buy me a coffee ☕ by scanning this
+code with any Vietnamese banking app (Napas 247 / VietQR):
+
+<img src="docs/media/donate-qr.png" width="200" alt="Napas 247 QR code to buy the developer a coffee">
+
+Starring the repo and [reporting issues](../../issues) helps too.
+
 ## Build from source
 Requires Swift 6 toolchain (Command Line Tools are enough; Xcode is not required).
 

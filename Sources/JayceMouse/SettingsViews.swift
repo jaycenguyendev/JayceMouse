@@ -221,6 +221,20 @@ struct AboutView: View {
                 }
             }
             Card {
+                HStack(spacing: 16) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Enjoying JayceMouse?").font(.system(size: 14, weight: .semibold))
+                        Text("It is free and always will be. A coffee keeps the updates coming.")
+                            .font(.system(size: 13)).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Link(destination: URL(string: "https://jaycemouse.vercel.app/#support")!) {
+                        Label("Buy me a coffee", systemImage: "cup.and.saucer.fill")
+                            .font(.system(size: 13, weight: .semibold))
+                    }
+                }
+            }
+            Card {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Acknowledgements").font(.system(size: 14, weight: .semibold))
                     Text("JayceMouse is inspired by Mac Mouse Fix by Noah Nuebling. It is an independent implementation written from scratch and shares no code or assets with it.")
