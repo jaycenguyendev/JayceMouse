@@ -26,7 +26,16 @@ Requires macOS 14 or later (Apple Silicon and Intel).
      ```
 4. When asked, turn JayceMouse on in **System Settings → Privacy & Security → Accessibility**. Nothing works until you do.
 
-Updating: replace the app with the new version. Because releases are ad-hoc signed, macOS forgets the Accessibility permission after an update. Remove JayceMouse from the Accessibility list with the minus button, then add it back (or toggle it off and on).
+Updating: replace the app with the new version. Because releases are ad-hoc signed, each build has a new signature, so the
+old Accessibility entry no longer applies and toggling it off and on does not help. After updating:
+1. Quit JayceMouse from the menu bar.
+2. Remove the old entry: select JayceMouse in **System Settings → Privacy & Security → Accessibility** and click the
+   **–** button, or run:
+   ```bash
+   tccutil reset Accessibility app.jaycemouse.JayceMouse
+   ```
+3. Open JayceMouse, click **Grant Access** and switch on the new entry. If it still says *Needs access*, quit and reopen
+   the app once.
 
 To confirm the zip was built by this repository's release workflow (and not tampered with), run, with the [GitHub CLI](https://cli.github.com/):
 ```bash
