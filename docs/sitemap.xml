@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+  <url>
+    <loc>https://jaycemouse.vercel.app/</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <video:video>
+      <video:thumbnail_loc>https://jaycemouse.vercel.app/media/jaycemouse-launch-poster.jpg</video:thumbnail_loc>
+      <video:title>JayceMouse — turn your mouse into a trackpad</video:title>
+      <video:description>30-second demo of smooth scrolling and trackpad gestures on a Mac mouse with JayceMouse.</video:description>
+      <video:content_loc>https://jaycemouse.vercel.app/media/jaycemouse-launch.mp4</video:content_loc>
+      <video:duration>30</video:duration>
+    </video:video>
+  </url>
+</urlset>

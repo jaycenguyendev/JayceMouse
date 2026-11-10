@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>JayceMouse — Your mouse, supercharged</title>
-<meta name="description" content="Free, open-source macOS app that gives any mouse trackpad-smooth scrolling, custom buttons and gestures.">
+<title>JayceMouse — Smooth scrolling &amp; trackpad gestures for any Mac mouse</title>
+<meta name="description" content="JayceMouse is a free, open-source Mac app that makes any mouse feel like a trackpad: smooth scrolling, Spaces and Mission Control gestures, and custom buttons.">
+<meta name="robots" content="index, follow, max-image-preview:large, max-video-preview:-1">
 <link rel="canonical" href="https://jaycemouse.vercel.app/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="JayceMouse">
@@ -417,6 +418,127 @@ footer a:hover { color: var(--text); }
   .reveal { opacity: 1; transform: none; }
 }
 </style>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "WebSite",
+   "@id": "https://jaycemouse.vercel.app/#website",
+   "name": "JayceMouse",
+   "url": "https://jaycemouse.vercel.app/"
+  },
+  {
+   "@type": "SoftwareApplication",
+   "@id": "https://jaycemouse.vercel.app/#app",
+   "name": "JayceMouse",
+   "url": "https://jaycemouse.vercel.app/",
+   "description": "Free, open-source macOS app that makes any mouse feel like a trackpad: smooth scrolling, Spaces and Mission Control gestures, and custom mouse buttons.",
+   "applicationCategory": "UtilitiesApplication",
+   "operatingSystem": "macOS 14 or later",
+   "softwareVersion": "1.0.0",
+   "downloadUrl": "https://jaycemouse.vercel.app/download",
+   "installUrl": "https://jaycemouse.vercel.app/download",
+   "image": "https://jaycemouse.vercel.app/media/og-image.jpg",
+   "screenshot": "https://jaycemouse.vercel.app/media/jaycemouse-launch-poster.jpg",
+   "license": "https://opensource.org/licenses/MIT",
+   "isAccessibleForFree": true,
+   "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+   },
+   "author": {
+    "@type": "Person",
+    "name": "jaycenguyendev",
+    "url": "https://github.com/jaycenguyendev"
+   },
+   "sameAs": [
+    "https://github.com/jaycenguyendev/JayceMouse"
+   ]
+  },
+  {
+   "@type": "VideoObject",
+   "name": "JayceMouse — turn your mouse into a trackpad",
+   "description": "30-second demo: install JayceMouse and use your Mac mouse for smooth scrolling, Spaces, Mission Control and Show Desktop.",
+   "thumbnailUrl": "https://jaycemouse.vercel.app/media/jaycemouse-launch-poster.jpg",
+   "contentUrl": "https://jaycemouse.vercel.app/media/jaycemouse-launch.mp4",
+   "embedUrl": "https://jaycemouse.vercel.app/#watch",
+   "uploadDate": "2026-11-10",
+   "duration": "PT30S"
+  },
+  {
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Is JayceMouse really free?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. It is free, has no trial and no account, and the full source code is on GitHub under the MIT license."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How do I get smooth scrolling with a mouse on Mac?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Install JayceMouse and grant it Accessibility access. Every notch of your mouse wheel then turns into a smooth, accelerating glide, like a MacBook trackpad. You can choose Low, Regular or High smoothness, or turn it off."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can I use my mouse like a trackpad on Mac?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. Hold the middle mouse button and drag to switch between Spaces, open Mission Control or show the desktop, the same things you would do with trackpad swipes. You can also map any button to Back, Forward, zoom, media keys or a keyboard shortcut."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Why does macOS say it can't verify the app?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The app is not notarized by Apple, which requires a paid developer membership. Click Done, then Open Anyway in System Settings → Privacy & Security. You only need to do this once per download."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Why does it need Accessibility access?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "That permission lets JayceMouse see your mouse buttons and wheel and send the smooth scroll and shortcut events. Without it, nothing can work."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Which Macs and mice are supported?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "macOS 14 Sonoma or later, on Apple silicon and Intel. It works with any USB or Bluetooth mouse. Smooth scrolling applies to notched scroll wheels; trackpads and Magic Mouse are left as they are."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Does it collect any data?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. The app has no network code and no analytics. Your settings stay on your Mac in ~/Library/Application Support/JayceMouse."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How is it related to Mac Mouse Fix?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "JayceMouse is inspired by Mac Mouse Fix by Noah Nuebling. It is an independent implementation written from scratch and shares no code or assets with it."
+     }
+    }
+   ]
+  }
+ ]
+}
+</script>
 </head>
 <body>
 
@@ -499,7 +621,7 @@ footer a:hover { color: var(--text); }
     <div class="wrap">
       <span class="badge"><b>New</b> Version 1.0 · free &amp; open source</span>
       <h1>Your mouse,<br><span class="grad-text">supercharged.</span></h1>
-      <p class="lead">Trackpad-smooth scrolling, buttons that do anything and gestures without a trackpad. One small app for any mouse on your Mac.</p>
+      <p class="lead">JayceMouse gives any mouse on your Mac trackpad-smooth scrolling, buttons that do anything and gestures without a trackpad. Free and open source.</p>
       <div class="hero-ctas">
         <a class="btn btn-brand" href="/download"><svg><use href="#i-download"/></svg>Download for macOS</a>
         <a class="btn btn-ghost" href="https://github.com/jaycenguyendev/JayceMouse"><svg><use href="#i-github"/></svg>View on GitHub</a>
@@ -792,6 +914,8 @@ footer a:hover { color: var(--text); }
       </div>
       <div class="faq reveal">
         <details open><summary>Is JayceMouse really free?</summary><p>Yes. It is free, has no trial and no account, and the full source code is on GitHub under the MIT license.</p></details>
+        <details><summary>How do I get smooth scrolling with a mouse on Mac?</summary><p>Install JayceMouse and grant it Accessibility access. Every notch of your mouse wheel then turns into a smooth, accelerating glide, like a MacBook trackpad. You can choose Low, Regular or High smoothness, or turn it off.</p></details>
+        <details><summary>Can I use my mouse like a trackpad on Mac?</summary><p>Yes. Hold the middle mouse button and drag to switch between Spaces, open Mission Control or show the desktop, the same things you would do with trackpad swipes. You can also map any button to Back, Forward, zoom, media keys or a keyboard shortcut.</p></details>
         <details><summary>Why does macOS say it can't verify the app?</summary><p>The app is not notarized by Apple, which requires a paid developer membership. Click <b>Done</b>, then <b>Open Anyway</b> in System Settings → Privacy &amp; Security. You only need to do this once per download.</p></details>
         <details><summary>Why does it need Accessibility access?</summary><p>That permission lets JayceMouse see your mouse buttons and wheel and send the smooth scroll and shortcut events. Without it, nothing can work.</p></details>
         <details><summary>Which Macs and mice are supported?</summary><p>macOS 14 Sonoma or later, on Apple silicon and Intel. It works with any USB or Bluetooth mouse. Smooth scrolling applies to notched scroll wheels; trackpads and Magic Mouse are left as they are.</p></details>
