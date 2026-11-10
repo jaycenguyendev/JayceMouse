@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JayceMouse — Your mouse, supercharged</title>
+<meta name="description" content="Free, open-source macOS app that gives any mouse trackpad-smooth scrolling, custom buttons and gestures.">
+<meta property="og:title" content="JayceMouse — Your mouse, supercharged">
+<meta property="og:description" content="Smooth scrolling, custom buttons and trackpad-style gestures for any mouse on macOS. Free and open source.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23735CFA'/%3E%3Cstop offset='1' stop-color='%231ABDEB'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='21' y='13' width='22' height='38' rx='11' fill='white'/%3E%3Crect x='30.5' y='18' width='3' height='9' rx='1.5' fill='%23735CFA'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0c10;
+  --surface: #14151b;
+  --surface-2: #1b1c24;
+  --surface-3: #23242e;
+  --line: rgba(255,255,255,.08);
+  --line-strong: rgba(255,255,255,.14);
+  --text: #eceef4;
+  --muted: #9a9cab;
+  --faint: #6b6d7c;
+  --violet: #735cfa;
+  --cyan: #1abdeb;
+  --pink: #fa5c9e;
+  --mint: #33d69e;
+  --brand: linear-gradient(120deg, var(--violet), var(--cyan));
+  --radius-xl: 32px;
+  --radius-lg: 22px;
+  --radius-md: 14px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+a { color: inherit; text-decoration: none; }
+img, svg { display: block; }
+button { font: inherit; color: inherit; cursor: pointer; }
+.wrap { width: min(1180px, 100% - 32px); margin-inline: auto; }
+.grad-text { background: var(--brand); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.section { padding: 120px 0 0; }
+.section-head { max-width: 640px; margin: 0 auto 48px; text-align: center; }
+.section-head h2 { font-size: clamp(30px, 4.4vw, 46px); line-height: 1.1; letter-spacing: -.025em; margin: 12px 0 14px; font-weight: 800; }
+.section-head p { color: var(--muted); margin: 0; font-size: 17px; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  height: 48px; padding: 0 22px; border-radius: 999px; border: 0;
+  font-weight: 700; font-size: 15px; white-space: nowrap;
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: #fff; color: #111218; box-shadow: 0 10px 30px -10px rgba(255,255,255,.35); }
+.btn-brand { background: var(--brand); color: #fff; box-shadow: 0 12px 34px -12px rgba(115,92,250,.8); }
+.btn-ghost { background: rgba(255,255,255,.06); border: 1px solid var(--line-strong); color: var(--text); }
+.btn-ghost:hover { background: rgba(255,255,255,.1); }
+.btn svg { width: 18px; height: 18px; }
+
+/* Nav */
+.nav { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); background: rgba(11,12,16,.66); border-bottom: 1px solid var(--line); }
+.nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 16px; }
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; letter-spacing: -.01em; }
+.logo-mark { width: 32px; height: 32px; border-radius: 10px; background: var(--brand); display: grid; place-items: center; box-shadow: 0 6px 18px -6px rgba(115,92,250,.9); }
+.logo-mark i { width: 11px; height: 18px; border-radius: 6px; background: #fff; position: relative; }
+.logo-mark i::after { content: ""; position: absolute; left: 4.5px; top: 3px; width: 2px; height: 5px; border-radius: 2px; background: var(--violet); }
+.nav-links { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+.nav-links a { padding: 7px 16px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--muted); transition: color .2s, background .2s; }
+.nav-links a:hover, .nav-links a.active { color: #111218; background: #fff; }
+.nav .btn { height: 40px; padding: 0 18px; font-size: 14px; }
+
+/* Hero */
+.hero { position: relative; padding: 88px 0 0; text-align: center; }
+.hero::before {
+  content: ""; position: absolute; inset: -120px 0 auto; height: 620px; pointer-events: none;
+  background:
+    radial-gradient(520px 320px at 78% 10%, rgba(115,92,250,.22), transparent 70%),
+    radial-gradient(520px 320px at 18% 30%, rgba(26,189,235,.12), transparent 70%);
+}
+.badge { position: relative; display: inline-flex; align-items: center; gap: 10px; padding: 5px 14px 5px 5px; border-radius: 999px; background: rgba(255,255,255,.04); border: 1px solid var(--line-strong); font-size: 13.5px; color: var(--muted); font-weight: 500; }
+.badge b { padding: 3px 10px; border-radius: 999px; background: var(--brand); color: #fff; font-size: 12px; font-weight: 700; }
+.hero h1 { position: relative; font-size: clamp(42px, 7.4vw, 84px); line-height: 1.02; letter-spacing: -.035em; font-weight: 800; margin: 26px auto 20px; max-width: 900px; }
+.hero .lead { position: relative; color: var(--muted); font-size: clamp(16px, 2vw, 19px); max-width: 600px; margin: 0 auto 34px; }
+.hero-ctas { position: relative; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.hero-note { position: relative; margin-top: 16px; font-size: 13px; color: var(--faint); }
+
+/* Horizon + rising app window */
+.stage { position: relative; margin-top: 70px; padding-bottom: 20px; }
+.horizon-clip { position: absolute; inset: -40px 0 0; overflow: hidden; pointer-events: none; }
+.horizon {
+  position: absolute; left: 50%; top: 80px; width: max(1280px, 150vw); max-width: 2200px; aspect-ratio: 1;
+  transform: translateX(-50%); border-radius: 50%;
+  background: radial-gradient(closest-side, #0b0c10 92%, #12111c 97%, #191632 100%);
+  opacity: var(--glow, .6);
+}
+.horizon::before {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: linear-gradient(90deg, transparent 22%, var(--violet) 40%, #c6bcff 50%, var(--cyan) 60%, transparent 78%);
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
+          mask: radial-gradient(closest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
+}
+.horizon::after {
+  content: ""; position: absolute; inset: -60px; border-radius: 50%;
+  background: radial-gradient(closest-side, transparent 93%, rgba(115,92,250,.35) 96%, transparent 100%);
+  filter: blur(18px);
+}
+.horizon-glow { position: absolute; left: 50%; top: 40px; width: min(900px, 90vw); height: 260px; transform: translateX(-50%); background: radial-gradient(closest-side, rgba(115,92,250,.45), rgba(26,189,235,.14) 55%, transparent); filter: blur(30px); opacity: var(--glow, .6); pointer-events: none; }
+.window-rise { position: relative; z-index: 2; width: min(1040px, 100%); margin: 0 auto; padding-top: 110px; transform-origin: 50% 100%; transform: perspective(1600px) rotateX(var(--tilt, 22deg)) translateY(var(--lift, 70px)) scale(var(--scale, .92)); will-change: transform; }
+
+/* App window mock */
+.app {
+  display: grid; grid-template-columns: 210px 1fr; min-height: 540px; text-align: left;
+  border-radius: 18px; overflow: hidden; background: #16171e;
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 50px 120px -30px rgba(0,0,0,.9), 0 0 0 1px rgba(0,0,0,.4), 0 -20px 80px -40px rgba(115,92,250,.6);
+}
+.app-side { background: #1b1c22; border-right: 1px solid var(--line); padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+.traffic { display: flex; gap: 8px; padding: 2px 6px 22px; }
+.traffic i { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; }
+.traffic i:nth-child(2) { background: #febc2e; }
+.traffic i:nth-child(3) { background: #28c840; }
+.app-brand { display: flex; align-items: center; gap: 10px; padding: 0 8px 18px; font-weight: 800; font-size: 15px; }
+.app-brand .logo-mark { width: 30px; height: 30px; border-radius: 9px; }
+.side-item { display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: 11px; font-size: 13.5px; font-weight: 600; color: #b7b9c6; background: none; border: 0; text-align: left; width: 100%; transition: background .2s, color .2s; }
+.side-item svg { width: 16px; height: 16px; flex: none; }
+.side-item:hover { background: rgba(255,255,255,.05); }
+.side-item.on { background: var(--brand); color: #fff; box-shadow: 0 8px 22px -10px rgba(115,92,250,.9); }
+.side-item[disabled] { cursor: default; }
+.side-item[disabled]:hover { background: none; }
+.app-status { margin-top: auto; display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 12px; background: rgba(255,255,255,.04); font-size: 12.5px; font-weight: 700; }
+.app-status i { width: 8px; height: 8px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 10px var(--mint); }
+.app-main { position: relative; padding: 26px; background: radial-gradient(520px 300px at 100% 0%, rgba(115,92,250,.16), transparent 70%), radial-gradient(520px 300px at 0% 100%, rgba(26,189,235,.08), transparent 70%); }
+.pane { display: none; animation: paneIn .35s ease; }
+.pane.on { display: block; }
+@keyframes paneIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.card { background: rgba(255,255,255,.035); border: 1px solid var(--line); border-radius: 18px; padding: 18px; }
+.mock-hero { display: flex; align-items: center; gap: 20px; padding: 22px; }
+.mock-hero h3 { margin: 0 0 8px; font-size: 25px; line-height: 1.15; letter-spacing: -.02em; }
+.mock-hero p { margin: 0 0 14px; font-size: 13px; color: var(--muted); max-width: 360px; }
+.mock-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.mock-btn { font-size: 12px; font-weight: 700; padding: 7px 13px; border-radius: 999px; background: var(--brand); color: #fff; }
+.mock-btn.alt { background: rgba(255,255,255,.08); color: var(--text); }
+.mini-mouse { width: 92px; flex: none; margin-left: auto; }
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+.tile { padding: 14px; }
+.tile-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.tile-ico { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; color: #fff; }
+.tile-ico svg { width: 15px; height: 15px; }
+.tile b { display: block; font-size: 13px; }
+.tile span { font-size: 11.5px; color: var(--muted); }
+.switch { width: 34px; height: 20px; border-radius: 999px; background: rgba(255,255,255,.14); position: relative; flex: none; }
+.switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left .2s; }
+.switch.on { background: var(--c, var(--violet)); }
+.switch.on::after { left: 16px; }
+.activity { margin-top: 12px; }
+.activity-head { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+.activity-head span { color: var(--mint); font-weight: 600; font-size: 12px; }
+.act-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 12.5px; border-top: 1px solid var(--line); }
+.act-row:first-of-type { border-top: 0; }
+.act-row i { width: 6px; height: 6px; border-radius: 50%; background: var(--violet); }
+.act-row time { margin-left: auto; color: var(--faint); font-size: 11.5px; }
+.pane-title { margin: 0 0 4px; font-size: 22px; letter-spacing: -.02em; }
+.pane-sub { margin: 0 0 16px; font-size: 13px; color: var(--muted); }
+.remap { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-top: 1px solid var(--line); font-size: 13px; }
+.remap:first-child { border-top: 0; }
+.chip { font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.07); white-space: nowrap; }
+.remap .arrow { color: var(--faint); }
+.remap .fx { margin-left: auto; display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.fx-ico { width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; background: var(--brand); color: #fff; }
+.fx-ico svg { width: 13px; height: 13px; }
+.pills { display: inline-flex; padding: 4px; gap: 4px; border-radius: 999px; background: rgba(255,255,255,.05); margin: 8px 0 6px; }
+.pills span { font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 999px; color: var(--muted); }
+.pills span.on { background: var(--brand); color: #fff; }
+.set-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid var(--line); font-size: 13px; }
+.set-row:first-child { border-top: 0; }
+.set-row div { flex: 1; }
+.set-row small { display: block; color: var(--muted); font-size: 11.5px; }
+
+/* Product showcase card (reference: hero product card) */
+.showcase {
+  position: relative; border-radius: var(--radius-xl); overflow: hidden;
+  background:
+    radial-gradient(520px 420px at 50% 58%, rgba(115,92,250,.22), transparent 70%),
+    radial-gradient(420px 320px at 50% 75%, rgba(26,189,235,.12), transparent 70%),
+    linear-gradient(160deg, #20212b 0%, #15161d 55%, #101117 100%);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 60px 120px -50px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,255,255,.06);
+  padding: 26px 34px 30px;
+}
+.sc-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sc-tabs { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: rgba(0,0,0,.25); border: 1px solid var(--line); }
+.sc-tabs button { border: 0; background: none; padding: 7px 15px; border-radius: 999px; font-size: 12.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); transition: background .25s, color .25s; }
+.sc-tabs button.on { background: #fff; color: #111218; }
+.icon-btns { display: flex; gap: 8px; }
+.icon-btn { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.06); border: 1px solid var(--line); transition: background .2s; }
+.icon-btn:hover { background: rgba(255,255,255,.12); }
+.icon-btn svg { width: 16px; height: 16px; }
+.sc-grid { display: grid; grid-template-columns: 1.05fr 1fr .8fr; align-items: center; gap: 18px; min-height: 440px; }
+.sc-copy .arrows { display: flex; gap: 8px; margin-bottom: 22px; }
+.sc-copy .arrows button { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-strong); background: rgba(255,255,255,.04); display: grid; place-items: center; }
+.sc-copy .arrows svg { width: 14px; height: 14px; }
+.sc-copy h3 { font-size: clamp(32px, 4vw, 48px); line-height: 1.04; letter-spacing: -.03em; margin: 0 0 16px; font-weight: 800; min-height: 2.1em; }
+.sc-copy p { color: var(--muted); font-size: 15px; margin: 0 0 26px; max-width: 360px; min-height: 4.7em; }
+.fade { transition: opacity .25s ease, transform .25s ease; }
+.fade.out { opacity: 0; transform: translateY(6px); }
+.sc-mouse { position: relative; display: grid; place-items: center; height: 420px; }
+.mouse3d { width: 190px; transform: perspective(900px) rotateX(46deg) rotateZ(-22deg); animation: float 5s ease-in-out infinite; filter: drop-shadow(0 30px 30px rgba(0,0,0,.55)); }
+.floor { position: absolute; bottom: 52px; width: 210px; height: 36px; border-radius: 50%; background: radial-gradient(closest-side, rgba(0,0,0,.75), transparent); animation: floorPulse 5s ease-in-out infinite; }
+@keyframes float { 0%,100% { translate: 0 -8px; } 50% { translate: 0 8px; } }
+@keyframes floorPulse { 0%,100% { transform: scale(.85); opacity: .7; } 50% { transform: scale(1); opacity: 1; } }
+.mouse3d .glow-part { transition: opacity .35s ease; opacity: 0; }
+.mode-scroll .gp-wheel, .mode-buttons .gp-side, .mode-gestures .gp-middle { opacity: .9; }
+.ridges { animation: ridge var(--ridge-speed, 1.2s) var(--ridge-ease, linear) infinite; }
+@keyframes ridge { from { transform: translateY(0); } to { transform: translateY(-12px); } }
+.trail { opacity: 0; transition: opacity .35s ease; }
+.mode-gestures .trail { opacity: 1; }
+.trail path { stroke-dasharray: 6 8; animation: dash 1.2s linear infinite; }
+@keyframes dash { to { stroke-dashoffset: -28; } }
+.sc-side { justify-self: end; text-align: right; }
+.price { font-size: 46px; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+.price-sub { color: var(--muted); font-size: 13px; margin: 8px 0 34px; }
+.price-sub s { color: var(--faint); margin-right: 6px; }
+.choose { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+.dots { display: flex; gap: 8px; justify-content: flex-end; }
+.dots button { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line-strong); background: rgba(255,255,255,.05); font-size: 12px; font-weight: 700; color: var(--muted); transition: all .25s ease; }
+.dots button.on { background: #fff; color: #111218; border-color: #fff; box-shadow: 0 8px 22px -8px rgba(255,255,255,.5); }
+.dots-note { font-size: 12px; color: var(--faint); margin-top: 10px; font-family: "JetBrains Mono", monospace; }
+.sc-bottom { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 12px; margin-top: 6px; }
+.socials { display: flex; gap: 14px; color: var(--muted); }
+.socials a:hover { color: var(--text); }
+.socials svg { width: 18px; height: 18px; }
+.tagline { text-align: center; font-size: 17px; font-weight: 600; line-height: 1.3; }
+.variant { justify-self: end; display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,.04); border: 1px solid var(--line); border-radius: 18px; padding: 8px 14px 8px 8px; transition: background .2s; }
+.variant:hover { background: rgba(255,255,255,.08); }
+.variant .thumb { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; background: rgba(0,0,0,.25); }
+.variant .thumb svg { width: 22px; transform: rotate(-18deg); }
+.variant span { font-size: 12px; color: var(--muted); text-align: left; line-height: 1.3; }
+.variant b { display: block; color: var(--text); font-size: 13px; }
+
+/* Features */
+.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.feature { position: relative; padding: 26px; border-radius: var(--radius-lg); background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)); border: 1px solid var(--line); overflow: hidden; transition: border-color .3s, transform .3s; }
+.feature:hover { border-color: var(--line-strong); transform: translateY(-3px); }
+.feature::after { content: ""; position: absolute; inset: auto -40% -60% auto; width: 240px; height: 240px; border-radius: 50%; background: radial-gradient(closest-side, var(--c, var(--violet)), transparent); opacity: .12; transition: opacity .3s; }
+.feature:hover::after { opacity: .22; }
+.f-ico { width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center; color: #fff; background: var(--c, var(--violet)); margin-bottom: 18px; box-shadow: 0 10px 24px -12px var(--c, var(--violet)); }
+.f-ico svg { width: 21px; height: 21px; }
+.feature h3 { margin: 0 0 8px; font-size: 18px; letter-spacing: -.01em; }
+.feature p { margin: 0; color: var(--muted); font-size: 14.5px; }
+.feature ul { margin: 14px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+.feature li { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.06); color: #c8cad6; }
+
+/* Glide demo */
+.demo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.demo-pane { border-radius: var(--radius-lg); border: 1px solid var(--line); background: var(--surface); overflow: hidden; }
+.demo-pane.smooth { border-color: rgba(115,92,250,.45); box-shadow: 0 0 0 1px rgba(115,92,250,.2), 0 30px 80px -40px rgba(115,92,250,.6); }
+.demo-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 700; }
+.demo-head span { font-size: 12px; color: var(--muted); font-weight: 600; }
+.viewport { height: 340px; overflow: hidden; position: relative; overscroll-behavior: contain; cursor: ns-resize; }
+.viewport::after { content: ""; position: absolute; inset: auto 0 0; height: 60px; background: linear-gradient(transparent, var(--surface)); pointer-events: none; }
+.rows { padding: 16px; display: grid; gap: 10px; will-change: transform; }
+.row { display: flex; align-items: center; gap: 12px; height: 58px; padding: 0 16px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--line); font-size: 14px; font-weight: 600; }
+.row i { width: 28px; height: 28px; border-radius: 9px; background: var(--c); opacity: .9; flex: none; }
+.row small { margin-left: auto; color: var(--faint); font-weight: 500; }
+.demo-foot { display: flex; justify-content: center; gap: 10px; align-items: center; margin-top: 18px; color: var(--muted); font-size: 14px; flex-wrap: wrap; text-align: center; }
+.kbd { font-family: "JetBrains Mono", monospace; font-size: 12px; padding: 3px 8px; border-radius: 7px; background: var(--surface-2); border: 1px solid var(--line-strong); color: var(--text); }
+
+/* Shortcuts strip */
+.mods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px; }
+.mod { padding: 18px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); }
+.mod .kbd { display: inline-block; margin-bottom: 10px; }
+.mod b { display: block; font-size: 15px; }
+.mod span { font-size: 13px; color: var(--muted); }
+
+/* Install */
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; counter-reset: step; }
+.step { position: relative; min-width: 0; padding: 26px; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line); }
+.step::before { counter-increment: step; content: counter(step); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--brand); font-weight: 800; font-size: 14px; margin-bottom: 18px; }
+.step h3 { margin: 0 0 8px; font-size: 18px; }
+.step p { margin: 0; color: var(--muted); font-size: 14.5px; }
+.step p strong { color: var(--text); }
+.code { display: flex; align-items: center; gap: 10px; margin-top: 14px; padding: 10px 10px 10px 14px; border-radius: 12px; background: #0e0f14; border: 1px solid var(--line); font-family: "JetBrains Mono", monospace; font-size: 12px; color: #c9cbe0; }
+.code code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+.code button { flex: none; border: 1px solid var(--line-strong); background: rgba(255,255,255,.06); border-radius: 8px; font-size: 11.5px; font-weight: 700; padding: 5px 10px; font-family: "Plus Jakarta Sans", sans-serif; }
+.warn { margin-top: 16px; display: flex; gap: 14px; align-items: flex-start; padding: 18px 20px; border-radius: 18px; background: rgba(254,188,46,.06); border: 1px solid rgba(254,188,46,.22); font-size: 14px; color: #d9d2bd; }
+.warn > div { min-width: 0; }
+.warn svg { width: 20px; height: 20px; flex: none; color: #febc2e; margin-top: 2px; }
+.warn b { color: #fff; }
+
+/* FAQ */
+.faq { max-width: 820px; margin: 0 auto; display: grid; gap: 10px; }
+details { border-radius: 18px; background: var(--surface); border: 1px solid var(--line); padding: 0 22px; transition: border-color .2s; }
+details[open] { border-color: var(--line-strong); }
+summary { list-style: none; cursor: pointer; padding: 20px 0; font-weight: 700; font-size: 16px; display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; font-size: 22px; font-weight: 500; color: var(--muted); transition: transform .25s; }
+details[open] summary::after { transform: rotate(45deg); }
+details p { margin: 0 0 20px; color: var(--muted); font-size: 15px; }
+details code { font-family: "JetBrains Mono", monospace; font-size: 13px; background: var(--surface-2); padding: 2px 6px; border-radius: 6px; color: var(--text); }
+
+/* CTA + footer */
+.cta { position: relative; overflow: hidden; text-align: center; padding: 72px 24px; border-radius: var(--radius-xl); border: 1px solid var(--line-strong); background: radial-gradient(600px 300px at 50% 120%, rgba(115,92,250,.35), transparent 70%), linear-gradient(180deg, #181922, #111218); }
+.cta h2 { font-size: clamp(30px, 4.6vw, 50px); letter-spacing: -.03em; line-height: 1.08; margin: 0 0 14px; font-weight: 800; }
+.cta p { color: var(--muted); margin: 0 0 30px; }
+.cta .hero-ctas { justify-content: center; }
+footer { padding: 56px 0 48px; color: var(--faint); font-size: 13.5px; }
+footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: center; }
+footer nav { display: flex; gap: 20px; flex-wrap: wrap; }
+footer a:hover { color: var(--text); }
+
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+.reveal.in { opacity: 1; transform: none; }
+
+/* Responsive */
+@media (max-width: 1020px) {
+  .sc-grid { grid-template-columns: 1fr 1fr; }
+  .sc-side { grid-column: 1 / -1; justify-self: stretch; text-align: left; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+  .sc-side .price-sub { margin-bottom: 0; }
+  .dots { justify-content: flex-start; }
+  .features { grid-template-columns: repeat(2, 1fr); }
+  .mods { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 860px) {
+  .nav-links { display: none; }
+  .app { grid-template-columns: 64px 1fr; }
+  .app-side { padding: 14px 8px; }
+  .app-brand span, .side-item span, .app-status span { display: none; }
+  .app-brand { padding: 0 3px 16px; }
+  .traffic { padding: 2px 4px 18px; gap: 5px; }
+  .traffic i { width: 9px; height: 9px; }
+  .side-item { justify-content: center; padding: 10px 0; }
+  .app-status { justify-content: center; padding: 10px 0; }
+  .tiles { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; }
+  .demo { grid-template-columns: 1fr; }
+}
+@media (max-width: 680px) {
+  .section { padding-top: 88px; }
+  .hero { padding-top: 56px; }
+  .stage { margin-top: 44px; }
+  .window-rise { padding-top: 70px; }
+  .app-main { padding: 14px; }
+  .mock-hero { flex-direction: column; align-items: flex-start; padding: 16px; }
+  .mini-mouse { display: none; }
+  .activity { display: none; }
+  .tiles .tile:nth-child(3) { display: none; }
+  .remap { flex-wrap: wrap; }
+  .remap .fx { margin-left: 0; width: 100%; }
+  .showcase { padding: 18px 16px 20px; }
+  .sc-top { justify-content: center; }
+  .sc-top > .logo { display: none; }
+  .sc-tabs button { padding: 7px 12px; font-size: 11.5px; }
+  .icon-btns { display: none; }
+  .sc-grid { grid-template-columns: 1fr; min-height: 0; gap: 4px; }
+  .sc-copy { order: 1; padding-top: 20px; }
+  .sc-mouse { order: 2; height: 320px; }
+  .mouse3d { width: 150px; }
+  .floor { bottom: 34px; }
+  .sc-side { order: 3; }
+  .sc-copy h3 { min-height: 0; }
+  .sc-copy p { min-height: 0; }
+  .sc-bottom { grid-template-columns: 1fr; justify-items: center; gap: 18px; margin-top: 24px; }
+  .variant { justify-self: center; }
+  .features { grid-template-columns: 1fr; }
+  .mods { grid-template-columns: 1fr 1fr; }
+  .viewport { height: 280px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .window-rise { transform: none; }
+  .reveal { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-mouse" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 6.5v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-click" viewBox="0 0 24 24"><path d="M9 9l11 4-5 2-2 5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M5 3v3M2 6h3M8.5 4.5 6.8 6.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-hand" viewBox="0 0 24 24"><path d="M5 12V8m4 4V5a1.5 1.5 0 0 1 3 0v6m0-1a1.5 1.5 0 0 1 3 0v2m0-.5a1.5 1.5 0 0 1 3 0V15a7 7 0 0 1-7 6h-1a6 6 0 0 1-5-3l-2.5-4a1.5 1.5 0 0 1 2.5-1.6L9 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-keys" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6.5 10h.01M10 10h.01M14 10h.01M17.5 10h.01M7.5 14h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-pointer" viewBox="0 0 24 24"><path d="M5 3l14 7-6 2-2 6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h10m4 0h2M4 17h2m4 0h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="16" cy="7" r="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8" cy="17" r="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 7.5h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-updown" viewBox="0 0 24 24"><path d="M8 20V5M4.5 8.5 8 5l3.5 3.5M16 4v15m-3.5-3.5L16 19l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M5 19.5h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.86v2.76c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="7.5" cy="8.5" r="1.4" fill="currentColor"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3 2 20h20zM12 10v4M12 17h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-desktop" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 20h8M12 16v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v15H6a2 2 0 0 0-2 2zM4 20a2 2 0 0 0 2 2h13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M10 6l-6 6 6 6M4 12h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-spaces" viewBox="0 0 24 24"><rect x="2.5" y="6" width="8" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13.5" y="6" width="8" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+
+    <linearGradient id="body-graphite" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4a4c5a"/><stop offset=".55" stop-color="#1c1d24"/><stop offset="1" stop-color="#0f1015"/>
+    </linearGradient>
+    <linearGradient id="body-silver" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6f7fa"/><stop offset=".55" stop-color="#c9ccd6"/><stop offset="1" stop-color="#8f93a2"/>
+    </linearGradient>
+    <radialGradient id="spec" cx=".32" cy=".2" r=".55">
+      <stop offset="0" stop-color="#fff" stop-opacity=".42"/><stop offset=".45" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#735cfa"/><stop offset="1" stop-color="#1abdeb"/>
+    </linearGradient>
+    <clipPath id="wheelClip"><rect x="91" y="40" width="18" height="48" rx="9"/></clipPath>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+    <symbol id="mouse-art" viewBox="0 0 200 300">
+      <path d="M100 10C152 10 182 48 182 112v86c0 58-36 92-82 92s-82-34-82-92v-86C18 48 48 10 100 10z" style="fill:var(--body-fill,url(#body-graphite))"/>
+      <path d="M100 10C152 10 182 48 182 112v86c0 58-36 92-82 92s-82-34-82-92v-86C18 48 48 10 100 10z" fill="url(#spec)"/>
+      <path d="M100 10C152 10 182 48 182 112v86c0 58-36 92-82 92s-82-34-82-92v-86C18 48 48 10 100 10z" fill="none" stroke="url(#rim)" stroke-opacity=".55" stroke-width="1.6"/>
+      <path d="M100 12v108M20 124c26 9 54 13 80 13s54-4 80-13" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="1.6"/>
+      <path d="M101 12v108M20 126c26 9 54 13 80 13s54-4 80-13" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="1"/>
+      <rect class="glow-part gp-wheel" x="84" y="32" width="32" height="64" rx="16" fill="url(#rim)" filter="url(#soft)" opacity="0"/>
+      <rect class="glow-part gp-middle" x="70" y="24" width="60" height="88" rx="30" fill="url(#rim)" filter="url(#soft)" opacity="0"/>
+      <rect x="91" y="40" width="18" height="48" rx="9" fill="#08090c"/>
+      <g clip-path="url(#wheelClip)"><g class="ridges">
+        <rect x="93" y="38" width="14" height="3" rx="1.5" fill="#5b5e6e"/><rect x="93" y="50" width="14" height="3" rx="1.5" fill="#5b5e6e"/><rect x="93" y="62" width="14" height="3" rx="1.5" fill="#5b5e6e"/><rect x="93" y="74" width="14" height="3" rx="1.5" fill="#5b5e6e"/><rect x="93" y="86" width="14" height="3" rx="1.5" fill="#5b5e6e"/><rect x="93" y="98" width="14" height="3" rx="1.5" fill="#5b5e6e"/>
+      </g></g>
+      <rect x="91" y="40" width="18" height="48" rx="9" fill="none" stroke="url(#rim)" stroke-opacity=".8"/>
+      <rect class="glow-part gp-side" x="6" y="140" width="22" height="80" rx="11" fill="url(#rim)" filter="url(#soft)" opacity="0"/>
+      <rect x="13" y="148" width="9" height="28" rx="4.5" fill="#0c0d11" stroke="url(#rim)" stroke-opacity=".7"/>
+      <rect x="13" y="182" width="9" height="28" rx="4.5" fill="#0c0d11" stroke="url(#rim)" stroke-opacity=".7"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="JayceMouse home"><span class="logo-mark"><i></i></span>JayceMouse</a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#features">Features</a>
+      <a href="#glide">Try it</a>
+      <a href="#install">Install</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a class="btn btn-primary" href="https://github.com/jaycenguyendev/JayceMouse/releases/latest"><svg><use href="#i-download"/></svg>Download</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <span class="badge"><b>New</b> Version 1.0 · free &amp; open source</span>
+      <h1>Your mouse,<br><span class="grad-text">supercharged.</span></h1>
+      <p class="lead">Trackpad-smooth scrolling, buttons that do anything and gestures without a trackpad. One small app for any mouse on your Mac.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-brand" href="https://github.com/jaycenguyendev/JayceMouse/releases/latest"><svg><use href="#i-download"/></svg>Download for macOS</a>
+        <a class="btn btn-ghost" href="https://github.com/jaycenguyendev/JayceMouse"><svg><use href="#i-github"/></svg>View on GitHub</a>
+      </div>
+      <p class="hero-note">macOS 14 Sonoma or later · Apple silicon &amp; Intel · MIT licensed</p>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="horizon-clip"><div class="horizon"></div><div class="horizon-glow"></div></div>
+      <div class="wrap">
+        <div class="window-rise" id="rise">
+          <div class="app" role="img" aria-label="The JayceMouse settings window">
+            <aside class="app-side">
+              <div class="traffic"><i></i><i></i><i></i></div>
+              <div class="app-brand"><span class="logo-mark"><i></i></span><span>JayceMouse</span></div>
+              <button class="side-item on" data-pane="overview"><svg><use href="#i-grid"/></svg><span>Overview</span></button>
+              <button class="side-item" data-pane="buttons"><svg><use href="#i-mouse"/></svg><span>Buttons</span></button>
+              <button class="side-item" data-pane="scrolling"><svg><use href="#i-updown"/></svg><span>Scrolling</span></button>
+              <button class="side-item" disabled><svg><use href="#i-pointer"/></svg><span>Pointer</span></button>
+              <button class="side-item" disabled><svg><use href="#i-sliders"/></svg><span>General</span></button>
+              <button class="side-item" disabled><svg><use href="#i-info"/></svg><span>About</span></button>
+              <div class="app-status"><i></i><span>Active</span></div>
+            </aside>
+            <div class="app-main">
+              <section class="pane on" data-pane="overview">
+                <div class="card mock-hero">
+                  <div>
+                    <h3 class="grad-text">Your mouse, supercharged.</h3>
+                    <p>Smooth scrolling, trackpad-style gestures and fully custom buttons — working system-wide. Press any button on your mouse to see it light up.</p>
+                    <div class="mock-btns"><span class="mock-btn">Customize Buttons</span><span class="mock-btn alt">Tune Scrolling</span></div>
+                  </div>
+                  <svg class="mini-mouse" viewBox="0 0 200 300"><use href="#mouse-art"/></svg>
+                </div>
+                <div class="tiles">
+                  <div class="card tile"><div class="tile-top"><span class="tile-ico" style="background:var(--cyan)"><svg><use href="#i-wind"/></svg></span><span class="switch on" style="--c:var(--cyan)"></span></div><b>Smooth Scrolling</b><span>High</span></div>
+                  <div class="card tile"><div class="tile-top"><span class="tile-ico" style="background:var(--violet)"><svg><use href="#i-click"/></svg></span><span class="switch on"></span></div><b>Button Actions</b><span>4 remaps</span></div>
+                  <div class="card tile"><div class="tile-top"><span class="tile-ico" style="background:var(--pink)"><svg><use href="#i-updown"/></svg></span><span class="switch"></span></div><b>Reverse Scroll</b><span>Follows system</span></div>
+                </div>
+                <div class="card activity">
+                  <div class="activity-head">Live activity <span>Listening</span></div>
+                  <div class="act-row"><i></i>Look Up<time>now</time></div>
+                  <div class="act-row"><i style="background:var(--cyan)"></i>Scroll · Smooth<time>2s ago</time></div>
+                  <div class="act-row"><i style="background:var(--mint)"></i>Middle Button pressed<time>5s ago</time></div>
+                </div>
+              </section>
+              <section class="pane" data-pane="buttons">
+                <h4 class="pane-title">Buttons</h4>
+                <p class="pane-sub">Teach every button a new trick.</p>
+                <div class="card" style="padding:4px 4px">
+                  <div class="remap"><span class="chip">Middle</span><span class="chip">Click</span><span class="arrow">→</span><span class="fx"><span class="fx-ico"><svg><use href="#i-book"/></svg></span>Look Up</span></div>
+                  <div class="remap"><span class="chip">Middle</span><span class="chip">Hold</span><span class="arrow">→</span><span class="fx"><span class="fx-ico"><svg><use href="#i-desktop"/></svg></span>Show Desktop</span></div>
+                  <div class="remap"><span class="chip">Middle</span><span class="chip">Drag</span><span class="arrow">→</span><span class="fx"><span class="fx-ico"><svg><use href="#i-spaces"/></svg></span>Spaces &amp; Mission Control</span></div>
+                  <div class="remap"><span class="chip">Button 4</span><span class="chip">Click</span><span class="arrow">→</span><span class="fx"><span class="fx-ico"><svg><use href="#i-back"/></svg></span>Back</span></div>
+                  <div class="remap"><span class="chip">Button 5</span><span class="chip">Scroll</span><span class="arrow">→</span><span class="fx"><span class="fx-ico"><svg><use href="#i-updown"/></svg></span>Zoom in &amp; out</span></div>
+                </div>
+              </section>
+              <section class="pane" data-pane="scrolling">
+                <h4 class="pane-title">Scrolling</h4>
+                <p class="pane-sub">Make a plain scroll wheel glide like a trackpad.</p>
+                <div class="card">
+                  <b style="font-size:13px">Smoothness</b><br>
+                  <div class="pills"><span>Off</span><span>Low</span><span>Regular</span><span class="on">High</span></div>
+                  <br><b style="font-size:13px">Speed</b><br>
+                  <div class="pills"><span>Low</span><span class="on">Medium</span><span>High</span></div>
+                </div>
+                <div class="card" style="margin-top:12px; padding:6px 18px">
+                  <div class="set-row"><div>Reverse direction<small>Off follows your System Settings.</small></div><span class="switch"></span></div>
+                  <div class="set-row"><div>Trackpad simulation<small>Momentum and rubber banding, like a real trackpad.</small></div><span class="switch on"></span></div>
+                  <div class="set-row"><div>Precise by default<small>Hold ⌥ Option for this on demand.</small></div><span class="switch" style="--c:var(--mint)"></span></div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="showcase">
+    <div class="wrap">
+      <div class="showcase mode-scroll reveal" id="sc">
+        <div class="sc-top">
+          <a class="logo" href="#top"><span class="logo-mark"><i></i></span><span>JayceMouse</span></a>
+          <div class="sc-tabs" role="tablist" aria-label="Highlights">
+            <button class="on" data-mode="0" role="tab">Scrolling</button>
+            <button data-mode="1" role="tab">Buttons</button>
+            <button data-mode="2" role="tab">Gestures</button>
+          </div>
+          <div class="icon-btns">
+            <a class="icon-btn" href="https://github.com/jaycenguyendev/JayceMouse" aria-label="GitHub"><svg><use href="#i-github"/></svg></a>
+            <a class="icon-btn" href="https://github.com/jaycenguyendev/JayceMouse/releases/latest" aria-label="Download"><svg><use href="#i-download"/></svg></a>
+          </div>
+        </div>
+
+        <div class="sc-grid">
+          <div class="sc-copy">
+            <div class="arrows">
+              <button id="prev" aria-label="Previous highlight"><svg><use href="#i-chev-l"/></svg></button>
+              <button id="next" aria-label="Next highlight"><svg><use href="#i-chev"/></svg></button>
+            </div>
+            <h3 class="fade" id="sc-title">Scroll like<br>a trackpad.</h3>
+            <p class="fade" id="sc-text">Every notch of your wheel turns into a silky glide that speeds up when you flick, and stops cleanly at the edge of the page.</p>
+            <a class="btn btn-primary" href="#install">Get JayceMouse <svg><use href="#i-chev"/></svg></a>
+          </div>
+
+          <div class="sc-mouse" aria-hidden="true">
+            <div class="floor"></div>
+            <svg class="mouse3d" viewBox="0 0 200 300" overflow="visible">
+      <path d="M100 10C152 10 182 48 182 112v86c0 58-36 92-82 92s-82-34-82-92v-86C18 48 48 10 100 10z" style="fill:var(--body-fill,url(#body-graphite))"/>
+      <path d="M100 10C152 10 182 48 182 112v86c0 58-36 92-82 92s-82-34-82-92v-86C18 48 48 10 100 10z" fill="url(#spec)"/>
+      <path d="M100 10C152 10 182 48 182 112v86c0 58-36 92-82 92s-82-34-82-92v-86C18 48 48 10 100 10z" fill="none" stroke="url(#rim)" stroke-opacity=".55" stroke-width="1.6"/>
+      <path d="M100 12v108M20 124c26 9 54 13 80 13s54-4 80-13" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="1.6"/>
+      <path d="M101 12v108M20 126c26 9 54 13 80 13s54-4 80-13" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="1"/>
+      <rect class="glow-part gp-wheel" x="84" y="32" width="32" height="64" rx="16" fill="url(#rim)" filter="url(#soft)" opacity="0"/>
+      <rect class="glow-part gp-middle" x="70" y="24" width="60" height="88" rx="30" fill="url(#rim)" filter="url(#soft)" opacity="0"/>
+      <rect x="91" y="40" width="18" height="48" rx="9" fill="#08090c"/>
+      <g clip-path="url(#wheelClip)"><g class="ridges">
+        <rect x="93" y="38" width="14" height="3" rx="1.5" fill="#5b5e6e"/><rect x="93" y="50" width="14" height="3" rx="1.5" fill="#5b5e6e"/><rect x="93" y="62" width="14" height="3" rx="1.5" fill="#5b5e6e"/><rect x="93" y="74" width="14" height="3" rx="1.5" fill="#5b5e6e"/><rect x="93" y="86" width="14" height="3" rx="1.5" fill="#5b5e6e"/><rect x="93" y="98" width="14" height="3" rx="1.5" fill="#5b5e6e"/>
+      </g></g>
+      <rect x="91" y="40" width="18" height="48" rx="9" fill="none" stroke="url(#rim)" stroke-opacity=".8"/>
+      <rect class="glow-part gp-side" x="6" y="140" width="22" height="80" rx="11" fill="url(#rim)" filter="url(#soft)" opacity="0"/>
+      <rect x="13" y="148" width="9" height="28" rx="4.5" fill="#0c0d11" stroke="url(#rim)" stroke-opacity=".7"/>
+      <rect x="13" y="182" width="9" height="28" rx="4.5" fill="#0c0d11" stroke="url(#rim)" stroke-opacity=".7"/>
+              <g class="trail" fill="none" stroke="url(#rim)" stroke-width="3" stroke-linecap="round">
+                <path d="M100 -10V-60"/><path d="M60 -6l-24-38"/><path d="M140 -6l24-38"/>
+              </g>
+            </svg>
+          </div>
+
+          <div class="sc-side">
+            <div>
+              <div class="price">Free</div>
+              <div class="price-sub">No trial · no account · MIT</div>
+            </div>
+            <div>
+              <div class="choose">Choose your smoothness:</div>
+              <div class="dots" role="radiogroup" aria-label="Smoothness">
+                <button data-smooth="off" role="radio">Off</button>
+                <button data-smooth="low" role="radio">Low</button>
+                <button data-smooth="regular" role="radio">Reg</button>
+                <button data-smooth="high" class="on" role="radio">High</button>
+              </div>
+              <div class="dots-note" id="dots-note">glide τ = 320 ms</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sc-bottom">
+          <div class="socials">
+            <a href="https://github.com/jaycenguyendev/JayceMouse" aria-label="GitHub"><svg><use href="#i-github"/></svg></a>
+            <a href="https://github.com/jaycenguyendev/JayceMouse/stargazers" aria-label="Star on GitHub"><svg><use href="#i-star"/></svg></a>
+            <a href="https://github.com/jaycenguyendev/JayceMouse/releases" aria-label="Releases"><svg><use href="#i-tag"/></svg></a>
+          </div>
+          <div class="tagline">Any mouse.<br>Trackpad smooth.</div>
+          <button class="variant" id="finish" aria-label="Switch mouse finish">
+            <span class="thumb"><svg viewBox="0 0 200 300" id="finish-thumb" style="--body-fill:url(#body-silver)"><use href="#mouse-art"/></svg></span>
+            <span><b id="finish-name">Silver</b>Works with any mouse</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Features</span>
+        <h2>Everything a trackpad does,<br><span class="grad-text">now on your mouse.</span></h2>
+        <p>Built natively for macOS with SwiftUI. Light on resources, and it never touches the network.</p>
+      </div>
+      <div class="features">
+        <article class="feature reveal" style="--c:var(--cyan)">
+          <div class="f-ico"><svg><use href="#i-wind"/></svg></div>
+          <h3>Smooth scrolling</h3>
+          <p>Four smoothness levels and three speeds, with flick acceleration and trackpad momentum.</p>
+          <ul><li>Off · Low · Regular · High</li><li>Momentum</li><li>Reverse direction</li></ul>
+        </article>
+        <article class="feature reveal" style="--c:var(--violet)">
+          <div class="f-ico"><svg><use href="#i-click"/></svg></div>
+          <h3>Buttons that do anything</h3>
+          <p>Click, double-click, triple-click, hold, drag or scroll with any button, plus keyboard or button modifiers.</p>
+          <ul><li>Look Up</li><li>Mission Control</li><li>Back / Forward</li><li>Any shortcut</li></ul>
+        </article>
+        <article class="feature reveal" style="--c:var(--pink)">
+          <div class="f-ico"><svg><use href="#i-hand"/></svg></div>
+          <h3>Trackpad gestures</h3>
+          <p>Drag with a button held to switch Spaces, open Mission Control or swipe between pages.</p>
+          <ul><li>Spaces</li><li>App Exposé</li><li>Show Desktop</li></ul>
+        </article>
+        <article class="feature reveal" style="--c:var(--mint)">
+          <div class="f-ico"><svg><use href="#i-keys"/></svg></div>
+          <h3>Media &amp; system keys</h3>
+          <p>Map buttons to volume, brightness, play/pause, Spotlight, Siri, Notification Center and Do Not Disturb.</p>
+          <ul><li>Volume</li><li>Brightness</li><li>Playback</li></ul>
+        </article>
+        <article class="feature reveal" style="--c:#8b8fff">
+          <div class="f-ico"><svg><use href="#i-pointer"/></svg></div>
+          <h3>Pointer tuning</h3>
+          <p>Set pointer sensitivity and acceleration, all the way down to 1:1 linear tracking. Restored when you quit.</p>
+          <ul><li>Sensitivity</li><li>Acceleration</li></ul>
+        </article>
+        <article class="feature reveal" style="--c:#f5a35c">
+          <div class="f-ico"><svg><use href="#i-sliders"/></svg></div>
+          <h3>Stays out of your way</h3>
+          <p>Lives in the menu bar, launches at login and has one-click switches to pause buttons or scrolling.</p>
+          <ul><li>Menu bar</li><li>Launch at login</li><li>3 &amp; 5-button presets</li></ul>
+        </article>
+      </div>
+      <div class="mods reveal">
+        <div class="mod"><span class="kbd">⇧ Shift</span><b>Horizontal</b><span>Scroll sideways</span></div>
+        <div class="mod"><span class="kbd">⌃ Control</span><b>Quick</b><span>Fly through long pages</span></div>
+        <div class="mod"><span class="kbd">⌥ Option</span><b>Precise</b><span>Small, exact steps</span></div>
+        <div class="mod"><span class="kbd">⌘ Command</span><b>Zoom</b><span>Zoom in and out</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="glide">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Try it here</span>
+        <h2>Feel the <span class="grad-text">difference.</span></h2>
+        <p>Scroll with your mouse wheel over both lists. The right one uses the same glide JayceMouse applies system-wide.</p>
+      </div>
+      <div class="demo reveal">
+        <div class="demo-pane">
+          <div class="demo-head">Standard wheel <span>Jumps one notch at a time</span></div>
+          <div class="viewport" id="vp-raw"><div class="rows"></div></div>
+        </div>
+        <div class="demo-pane smooth">
+          <div class="demo-head"><span class="grad-text" style="font-size:14px;font-weight:700">With JayceMouse</span><span id="demo-mode">Smoothness: High</span></div>
+          <div class="viewport" id="vp-smooth"><div class="rows"></div></div>
+        </div>
+      </div>
+      <p class="demo-foot">Best with a mouse wheel. Change smoothness above with the <span class="kbd">Off</span> <span class="kbd">Low</span> <span class="kbd">Reg</span> <span class="kbd">High</span> buttons.</p>
+    </div>
+  </section>
+
+  <section class="section" id="install">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Install</span>
+        <h2>Up and running<br><span class="grad-text">in a minute.</span></h2>
+        <p>JayceMouse is free and not sold through the App Store, so macOS asks you to allow it once.</p>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <h3>Download &amp; move</h3>
+          <p>Get the latest <strong>JayceMouse-x.y.z.zip</strong>, unzip it and drag <strong>JayceMouse.app</strong> into Applications.</p>
+          <a class="btn btn-brand" style="margin-top:18px;height:42px;font-size:14px" href="https://github.com/jaycenguyendev/JayceMouse/releases/latest"><svg><use href="#i-download"/></svg>Latest release</a>
+        </div>
+        <div class="step reveal">
+          <h3>Allow it to open</h3>
+          <p>If macOS says it <strong>could not verify</strong> the app, click <strong>Done</strong> (not Move to Trash). Then open <strong>System Settings → Privacy &amp; Security</strong> and click <strong>Open Anyway</strong>. Or run:</p>
+          <div class="code"><code id="xattr">xattr -dr com.apple.quarantine /Applications/JayceMouse.app</code><button data-copy="xattr">Copy</button></div>
+        </div>
+        <div class="step reveal">
+          <h3>Grant Accessibility</h3>
+          <p>Click <strong>Grant Access</strong> in the app and switch JayceMouse on under <strong>Privacy &amp; Security → Accessibility</strong>. The app comes alive right away.</p>
+        </div>
+      </div>
+      <div class="warn reveal">
+        <svg><use href="#i-warn"/></svg>
+        <div><b>Switched on but still “Needs access”?</b> That happens after an update, because each build has a new signature. Remove JayceMouse from the Accessibility list with the <b>–</b> button and add it again, or run
+          <div class="code" style="margin-top:10px"><code id="tcc">tccutil reset Accessibility app.jaycemouse.JayceMouse</code><button data-copy="tcc">Copy</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">FAQ</span>
+        <h2>Questions, <span class="grad-text">answered.</span></h2>
+      </div>
+      <div class="faq reveal">
+        <details open><summary>Is JayceMouse really free?</summary><p>Yes. It is free, has no trial and no account, and the full source code is on GitHub under the MIT license.</p></details>
+        <details><summary>Why does macOS say it can't verify the app?</summary><p>The app is not notarized by Apple, which requires a paid developer membership. Click <b>Done</b>, then <b>Open Anyway</b> in System Settings → Privacy &amp; Security. You only need to do this once per download.</p></details>
+        <details><summary>Why does it need Accessibility access?</summary><p>That permission lets JayceMouse see your mouse buttons and wheel and send the smooth scroll and shortcut events. Without it, nothing can work.</p></details>
+        <details><summary>Which Macs and mice are supported?</summary><p>macOS 14 Sonoma or later, on Apple silicon and Intel. It works with any USB or Bluetooth mouse. Smooth scrolling applies to notched scroll wheels; trackpads and Magic Mouse are left as they are.</p></details>
+        <details><summary>Does it collect any data?</summary><p>No. The app has no network code and no analytics. Your settings stay on your Mac in <code>~/Library/Application Support/JayceMouse</code>.</p></details>
+        <details><summary>How is it related to Mac Mouse Fix?</summary><p>JayceMouse is inspired by Mac Mouse Fix by Noah Nuebling. It is an independent implementation written from scratch and shares no code or assets with it.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="cta reveal">
+        <h2>Give your mouse<br><span class="grad-text">a second life.</span></h2>
+        <p>Free download for macOS 14 and later.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="https://github.com/jaycenguyendev/JayceMouse/releases/latest"><svg><use href="#i-download"/></svg>Download JayceMouse</a>
+          <a class="btn btn-ghost" href="https://github.com/jaycenguyendev/JayceMouse"><svg><use href="#i-star"/></svg>Star on GitHub</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="logo" href="#top"><span class="logo-mark"><i></i></span>JayceMouse</a>
+    <nav>
+      <a href="https://github.com/jaycenguyendev/JayceMouse">GitHub</a>
+      <a href="https://github.com/jaycenguyendev/JayceMouse/releases">Releases</a>
+      <a href="https://github.com/jaycenguyendev/JayceMouse/blob/main/LICENSE">MIT License</a>
+      <a href="https://github.com/jaycenguyendev/JayceMouse/issues">Report an issue</a>
+    </nav>
+    <span>Inspired by Mac Mouse Fix. Not affiliated with Apple.</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // App window rises out of the horizon as the hero scrolls away.
+  const stage = document.getElementById('stage');
+  const rise = document.getElementById('rise');
+  function onScroll() {
+    if (reduceMotion) return;
+    const rect = stage.getBoundingClientRect();
+    const vh = innerHeight;
+    const p = Math.min(Math.max((vh - rect.top) / (vh * 0.95), 0), 1);
+    const e = 1 - Math.pow(1 - p, 3);
+    rise.style.setProperty('--tilt', (22 * (1 - e)).toFixed(2) + 'deg');
+    rise.style.setProperty('--lift', (70 * (1 - e)).toFixed(1) + 'px');
+    rise.style.setProperty('--scale', (0.92 + 0.08 * e).toFixed(3));
+    stage.style.setProperty('--glow', (0.55 + 0.45 * e).toFixed(3));
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll);
+  onScroll();
+
+  // App mock sidebar
+  document.querySelectorAll('.side-item[data-pane]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.side-item').forEach(b => b.classList.toggle('on', b === btn));
+      document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.dataset.pane === btn.dataset.pane));
+    });
+  });
+
+  // Showcase modes
+  const modes = [
+    { cls: 'mode-scroll', title: 'Scroll like<br>a trackpad.', text: 'Every notch of your wheel turns into a silky glide that speeds up when you flick, and stops cleanly at the edge of the page.' },
+    { cls: 'mode-buttons', title: 'Every button,<br>your way.', text: 'Click, double-click, hold, drag or scroll with any button to trigger Mission Control, Look Up, Back, media keys or any shortcut.' },
+    { cls: 'mode-gestures', title: 'Gestures,<br>no trackpad.', text: 'Hold the middle button and drag to switch Spaces or open Mission Control — just like a three-finger swipe.' },
+  ];
+  const sc = document.getElementById('sc');
+  const title = document.getElementById('sc-title');
+  const text = document.getElementById('sc-text');
+  const tabs = [...document.querySelectorAll('.sc-tabs button')];
+  let mode = 0, autoplay;
+  function setMode(i) {
+    mode = (i + modes.length) % modes.length;
+    tabs.forEach((t, k) => { t.classList.toggle('on', k === mode); t.setAttribute('aria-selected', k === mode); });
+    modes.forEach(m => sc.classList.remove(m.cls));
+    sc.classList.add(modes[mode].cls);
+    title.classList.add('out'); text.classList.add('out');
+    setTimeout(() => {
+      title.innerHTML = modes[mode].title;
+      text.textContent = modes[mode].text;
+      title.classList.remove('out'); text.classList.remove('out');
+    }, 220);
+  }
+  function restartAutoplay() {
+    clearInterval(autoplay);
+    if (!reduceMotion) autoplay = setInterval(() => setMode(mode + 1), 6500);
+  }
+  tabs.forEach((t, k) => t.addEventListener('click', () => { setMode(k); restartAutoplay(); }));
+  document.getElementById('prev').addEventListener('click', () => { setMode(mode - 1); restartAutoplay(); });
+  document.getElementById('next').addEventListener('click', () => { setMode(mode + 1); restartAutoplay(); });
+  restartAutoplay();
+
+  // Mouse finish variant
+  let finish = 'Graphite';
+  const thumb = document.getElementById('finish-thumb');
+  document.getElementById('finish').addEventListener('click', () => {
+    const next = finish === 'Graphite' ? 'Silver' : 'Graphite';
+    sc.style.setProperty('--body-fill', `url(#body-${next.toLowerCase()})`);
+    thumb.style.setProperty('--body-fill', `url(#body-${finish.toLowerCase()})`);
+    document.getElementById('finish-name').textContent = finish;
+    finish = next;
+  });
+
+  // Smoothness — same constants as the app (ScrollMath.swift)
+  const smoothness = {
+    off: { tau: 0, label: 'Off', ridge: ['1.2s', 'steps(3)'] },
+    low: { tau: 0.07, label: 'Low', ridge: ['0.9s', 'linear'] },
+    regular: { tau: 0.13, label: 'Regular', ridge: ['1.2s', 'linear'] },
+    high: { tau: 0.32, label: 'High', ridge: ['1.8s', 'linear'] },
+  };
+  let tau = smoothness.high.tau;
+  const note = document.getElementById('dots-note');
+  const demoMode = document.getElementById('demo-mode');
+  document.querySelectorAll('.dots button').forEach(btn => {
+    btn.setAttribute('aria-checked', btn.classList.contains('on'));
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.dots button').forEach(b => { b.classList.toggle('on', b === btn); b.setAttribute('aria-checked', b === btn); });
+      const s = smoothness[btn.dataset.smooth];
+      tau = s.tau;
+      note.textContent = s.tau ? `glide τ = ${Math.round(s.tau * 1000)} ms` : 'no glide — raw steps';
+      demoMode.textContent = 'Smoothness: ' + s.label;
+      sc.style.setProperty('--ridge-speed', s.ridge[0]);
+      sc.style.setProperty('--ridge-ease', s.ridge[1]);
+    });
+  });
+
+  // Glide demo
+  const palette = ['#735cfa', '#1abdeb', '#fa5c9e', '#33d69e'];
+  const labels = ['Inbox', 'Design review', 'Weekly notes', 'Photos', 'Roadmap', 'Invoices', 'Reading list', 'Travel plans', 'Recipes', 'Music', 'Projects', 'Archive'];
+  document.querySelectorAll('.viewport .rows').forEach(rows => {
+    for (let i = 0; i < 36; i++) {
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML = `<i style="--c:${palette[i % 4]}"></i>${labels[i % labels.length]}<small>Row ${i + 1}</small>`;
+      rows.appendChild(row);
+    }
+  });
+
+  const BASE = 66, MAX_GAIN = 3.6, FAST = 0.018, SLOW = 0.16;
+  function gain(interval) {
+    const t = Math.min(Math.max((SLOW - interval) / (SLOW - FAST), 0), 1);
+    return 1 + (MAX_GAIN - 1) * t * t * (3 - 2 * t);
+  }
+  function isTick(e) { return e.deltaMode === 1 || (Math.abs(e.deltaY) >= 40 && Number.isInteger(e.deltaY)); }
+
+  function makeScroller(vp, smooth) {
+    const rows = vp.querySelector('.rows');
+    let y = 0, velocity = 0, lastTick = 0, lastFrame = 0, raf = 0;
+    const max = () => Math.max(rows.scrollHeight - vp.clientHeight, 0);
+    const apply = () => {
+      y = Math.min(Math.max(y, 0), max());
+      rows.style.transform = `translateY(${-y}px)`;
+    };
+    function frame(t) {
+      const dt = Math.min(Math.max((t - lastFrame) / 1000, 0.001), 0.1);
+      lastFrame = t;
+      const decay = Math.exp(-dt / tau);
+      y += velocity * tau * (1 - decay);
+      velocity *= decay;
+      const atEdge = (y <= 0 && velocity < 0) || (y >= max() && velocity > 0);
+      if (Math.abs(velocity) < 12 || atEdge) {
+        if (!atEdge) y += velocity * tau;
+        velocity = 0; apply(); raf = 0; return;
+      }
+      apply();
+      raf = requestAnimationFrame(frame);
+    }
+    vp.addEventListener('wheel', e => {
+      e.preventDefault();
+      const dir = Math.sign(e.deltaY);
+      if (!dir) return;
+      if (!isTick(e)) { velocity = 0; y += e.deltaY; apply(); return; }
+      const now = performance.now() / 1000;
+      const px = (smooth ? BASE * gain(now - lastTick) : BASE) * dir;
+      lastTick = now;
+      if (!smooth || tau === 0) { y += px; apply(); return; }
+      if (velocity * px < 0) velocity = 0;
+      velocity += px / tau;
+      if (!raf) { lastFrame = performance.now(); raf = requestAnimationFrame(frame); }
+    }, { passive: false });
+  }
+  makeScroller(document.getElementById('vp-raw'), false);
+  makeScroller(document.getElementById('vp-smooth'), true);
+
+  // Copy buttons
+  document.querySelectorAll('[data-copy]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const text = document.getElementById(btn.dataset.copy).textContent;
+      try { await navigator.clipboard.writeText(text); btn.textContent = 'Copied'; }
+      catch { btn.textContent = 'Select & copy'; }
+      setTimeout(() => (btn.textContent = 'Copy'), 1600);
+    });
+  });
+
+  // Reveal on scroll
+  const io = new IntersectionObserver(entries => entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  }), { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Highlight active nav section
+  const links = [...document.querySelectorAll('.nav-links a')];
+  const spy = new IntersectionObserver(entries => entries.forEach(e => {
+    if (e.isIntersecting) links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
+  }), { rootMargin: '-45% 0px -50% 0px' });
+  ['features', 'glide', 'install', 'faq'].forEach(id => spy.observe(document.getElementById(id)));
+})();
+</script>
+</body>
+</html>
