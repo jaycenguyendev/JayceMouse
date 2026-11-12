@@ -121,5 +121,21 @@ extension AppDelegate: NSMenuDelegate {
             menu.items.first { $0.action == #selector(toggleButtons(_:)) }?.state = general.buttonKillSwitch ? .on : .off
             menu.items.first { $0.action == #selector(toggleScroll(_:)) }?.state = general.scrollKillSwitch ? .on : .off
         }
+        refreshMouseItems(in: menu)
+    }
+
+    private static let mouseItemTag = 7_401
+
+    private func refreshMouseItems(in menu: NSMenu) {
+        menu.items.filter { $0.tag == Self.mouseItemTag }.forEach(menu.removeItem)
+        var items = ConnectedMice.current().map { $0.menuItem() }
+        if items.isEmpty {
+            items = [NSMenuItem(title: "No mouse connected", action: nil, keyEquivalent: "")]
+        }
+        items.append(.separator())
+        for (index, item) in items.enumerated() {
+            item.tag = Self.mouseItemTag
+            menu.insertItem(item, at: index)
+        }
     }
 }
