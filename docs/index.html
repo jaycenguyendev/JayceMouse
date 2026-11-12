@@ -452,7 +452,7 @@ footer a:hover { color: var(--text); }
    "description": "Free, open-source macOS app that makes any mouse feel like a trackpad: smooth scrolling, Spaces and Mission Control gestures, and custom mouse buttons.",
    "applicationCategory": "UtilitiesApplication",
    "operatingSystem": "macOS 14 or later",
-   "softwareVersion": "1.0.0",
+   "softwareVersion": "1.0.2",
    "downloadUrl": "https://jaycemouse.vercel.app/download",
    "installUrl": "https://jaycemouse.vercel.app/download",
    "image": "https://jaycemouse.vercel.app/media/og-image.jpg",
@@ -635,7 +635,7 @@ footer a:hover { color: var(--text); }
 <main id="top">
   <section class="hero">
     <div class="wrap">
-      <span class="badge"><b>New</b> Version 1.0 · free &amp; open source</span>
+      <span class="badge"><b>New</b> Version <span id="app-version">1.0.2</span> · free &amp; open source</span>
       <h1>Your mouse,<br><span class="grad-text">supercharged.</span></h1>
       <p class="lead">JayceMouse gives any mouse on your Mac trackpad-smooth scrolling, buttons that do anything and gestures without a trackpad. Free and open source.</p>
       <div class="hero-ctas">
@@ -1187,7 +1187,11 @@ footer a:hover { color: var(--text); }
     try {
       const res = await fetch('https://api.github.com/repos/jaycenguyendev/JayceMouse/releases?per_page=100');
       if (!res.ok) return;
-      const total = (await res.json()).flatMap(r => r.assets)
+      const releases = await res.json();
+      const latest = releases.filter(r => !r.draft && !r.prerelease)
+        .sort((a, b) => new Date(b.published_at) - new Date(a.published_at))[0];
+      if (latest) document.getElementById('app-version').textContent = latest.tag_name.replace(/^v/, '');
+      const total = releases.flatMap(r => r.assets)
         .filter(a => a.name.endsWith('.zip')).reduce((sum, a) => sum + a.download_count, 0);
       if (total > 0) { showCount(total); try { localStorage.setItem('jm-downloads', total); } catch {} }
     } catch {}
