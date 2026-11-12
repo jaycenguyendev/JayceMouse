@@ -51,6 +51,10 @@ Releases from v1.0.1 on carry this attestation. The `.sha256` files next to each
 - **Gestures**: Desktop & Launchpad scroll, Scroll & Navigate (two-finger swipe), Spaces & Mission Control (three-finger swipe), scroll to switch Spaces / zoom.
 - **Pointer**: sensitivity and acceleration via the system HID acceleration setting (restored on quit).
 - **General**: menu bar item, launch at login, kill switches, lock pointer during drag, 3-/5-button presets.
+- **Menu bar app**: the Dock icon shows only while the settings window is open; close the window and JayceMouse stays in the menu bar.
+- **Battery levels** (optional, in General, separate switches for mouse and keyboard): the menu bar menu lists the battery % of Bluetooth devices that report one to macOS.
+- **Language**: English or Vietnamese interface, switchable from the menu bar menu.
+- **Snap to OK**: when a dialog asks for confirmation, the pointer jumps onto its OK (default) button. Toggle it in General.
 
 ## Support
 JayceMouse is free and always will be. If it made your mouse feel better, you can buy me a coffee ☕ by scanning this

@@ -12,50 +12,50 @@ enum EffectCatalog {
         switch effect {
         case .hotkey(let h):
             switch h {
-            case .missionControl: return "Mission Control"
-            case .appExpose: return "App Exposé"
-            case .showDesktop: return "Show Desktop"
-            case .spotlight: return "Spotlight"
-            case .lookUp: return "Look Up & Data Detectors"
-            case .appSwitcher: return "App Switcher"
-            case .moveLeftSpace: return "Move Left a Space"
-            case .moveRightSpace: return "Move Right a Space"
-            case .launchpad: return "Launchpad"
-            case .notificationCenter: return "Notification Center"
-            case .doNotDisturb: return "Do Not Disturb"
-            case .siri: return "Siri"
+            case .missionControl: return tr("Mission Control")
+            case .appExpose: return tr("App Exposé")
+            case .showDesktop: return tr("Show Desktop")
+            case .spotlight: return tr("Spotlight")
+            case .lookUp: return tr("Look Up & Data Detectors")
+            case .appSwitcher: return tr("App Switcher")
+            case .moveLeftSpace: return tr("Move Left a Space")
+            case .moveRightSpace: return tr("Move Right a Space")
+            case .launchpad: return tr("Launchpad")
+            case .notificationCenter: return tr("Notification Center")
+            case .doNotDisturb: return tr("Do Not Disturb")
+            case .siri: return tr("Siri")
             }
-        case .smartZoom: return "Smart Zoom (experimental)"
+        case .smartZoom: return tr("Smart Zoom (experimental)")
         case .keyboard(let combo): return KeyNames.describe(combo)
-        case .mouseButton(let b): return b == 2 ? "Middle Click" : "Button \(b + 1) Click"
+        case .mouseButton(let b): return b == 2 ? tr("Middle Click") : tr("Button %@ Click", "\(b + 1)")
         case .system(let k):
             switch k {
-            case .brightnessUp: return "Brightness Up"
-            case .brightnessDown: return "Brightness Down"
-            case .volumeUp: return "Volume Up"
-            case .volumeDown: return "Volume Down"
-            case .mute: return "Mute"
-            case .playPause: return "Play / Pause"
-            case .nextTrack: return "Next Track"
-            case .previousTrack: return "Previous Track"
-            case .keyboardBrightnessUp: return "Keyboard Backlight Up"
-            case .keyboardBrightnessDown: return "Keyboard Backlight Down"
+            case .brightnessUp: return tr("Brightness Up")
+            case .brightnessDown: return tr("Brightness Down")
+            case .volumeUp: return tr("Volume Up")
+            case .volumeDown: return tr("Volume Down")
+            case .mute: return tr("Mute")
+            case .playPause: return tr("Play / Pause")
+            case .nextTrack: return tr("Next Track")
+            case .previousTrack: return tr("Previous Track")
+            case .keyboardBrightnessUp: return tr("Keyboard Backlight Up")
+            case .keyboardBrightnessDown: return tr("Keyboard Backlight Down")
             }
-        case .back: return "Back"
-        case .forward: return "Forward"
+        case .back: return tr("Back")
+        case .forward: return tr("Forward")
         case .drag(let d):
             switch d {
-            case .twoFingerSwipe: return "Scroll & Navigate"
-            case .threeFingerSwipe: return "Spaces & Mission Control"
+            case .twoFingerSwipe: return tr("Scroll & Navigate")
+            case .threeFingerSwipe: return tr("Spaces & Mission Control")
             }
         case .scroll(let s):
             switch s {
-            case .zoom: return "Zoom"
-            case .horizontalScroll: return "Horizontal Scroll"
-            case .quickScroll: return "Quick Scroll"
-            case .preciseScroll: return "Precise Scroll"
-            case .spacesSwitch: return "Switch Spaces"
-            case .desktopAndLaunchpad: return "Desktop & Launchpad"
+            case .zoom: return tr("Zoom")
+            case .horizontalScroll: return tr("Horizontal Scroll")
+            case .quickScroll: return tr("Quick Scroll")
+            case .preciseScroll: return tr("Precise Scroll")
+            case .spacesSwitch: return tr("Switch Spaces")
+            case .desktopAndLaunchpad: return tr("Desktop & Launchpad")
             }
         }
     }
@@ -146,19 +146,19 @@ enum KeyNames {
         if combo.modifiers.contains(.option) { out += "⌥" }
         if combo.modifiers.contains(.shift) { out += "⇧" }
         if combo.modifiers.contains(.command) { out += "⌘" }
-        return out + (names[combo.keyCode] ?? "Key \(combo.keyCode)")
+        return out + (names[combo.keyCode] ?? tr("Key %@", "\(combo.keyCode)"))
     }
 }
 
 extension ButtonGesture {
     var title: String {
         switch self {
-        case .click: return "Click"
-        case .doubleClick: return "Double Click"
-        case .tripleClick: return "Triple Click"
-        case .hold: return "Hold"
-        case .drag: return "Click & Drag"
-        case .scroll: return "Click & Scroll"
+        case .click: return tr("Click")
+        case .doubleClick: return tr("Double Click")
+        case .tripleClick: return tr("Triple Click")
+        case .hold: return tr("Hold")
+        case .drag: return tr("Click & Drag")
+        case .scroll: return tr("Click & Scroll")
         }
     }
 
@@ -176,9 +176,9 @@ extension ButtonGesture {
 
 func buttonName(_ button: Int) -> String {
     switch button {
-    case 0: return "Left Button"
-    case 1: return "Right Button"
-    case 2: return "Middle Button"
-    default: return "Button \(button + 1)"
+    case 0: return tr("Left Button")
+    case 1: return tr("Right Button")
+    case 2: return tr("Middle Button")
+    default: return tr("Button %@", "\(button + 1)")
     }
 }
