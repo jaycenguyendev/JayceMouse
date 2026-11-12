@@ -1,5 +1,6 @@
 import AppKit
 import Combine
+import os
 import ServiceManagement
 import SwiftUI
 import JayceMouseCore
@@ -22,6 +23,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var activity: [ActivityItem] = []
     @Published private(set) var scrollPulse = 0
     @Published var captureTarget: ((Int) -> Void)?
+    @Published private(set) var loginItemStatus: SMAppService.Status = .notRegistered
 
     let engine = InputEngine()
     private let pointer = PointerController()
@@ -38,6 +40,7 @@ final class AppModel: ObservableObject {
             DispatchQueue.main.async { self?.deliverCapture(button) }
         }
         pointer.apply(config.pointer)
+        reconcileLaunchAtLogin()
         refreshPermission()
         permissionTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.refreshPermission() }
@@ -93,17 +96,48 @@ final class AppModel: ObservableObject {
         }
     }
 
+    // The system keeps a login item record per signed binary, and ad-hoc builds get a new
+    // signature on every update, so an "enabled" record can point at a binary that no longer
+    // exists. Re-register once for each new binary while the user still wants it.
+    private func reconcileLaunchAtLogin() {
+        loginItemStatus = SMAppService.mainApp.status
+        Self.log.info("Login item status at launch: \(String(describing: self.loginItemStatus), privacy: .public)")
+        // A dev build in build/ would otherwise steal the login item from the installed copy.
+        guard Bundle.main.bundlePath.hasPrefix("/Applications/"), config.general.launchAtLogin else { return }
+        let fingerprint = Self.binaryFingerprint
+        let key = "loginItemRegisteredFor"
+        guard loginItemStatus != .requiresApproval,
+              UserDefaults.standard.string(forKey: key) != fingerprint || loginItemStatus != .enabled else { return }
+        updateLaunchAtLogin()
+        if loginItemStatus == .enabled { UserDefaults.standard.set(fingerprint, forKey: key) }
+    }
+
+    private static var binaryFingerprint: String {
+        let path = Bundle.main.executablePath ?? Bundle.main.bundlePath
+        let modified = (try? FileManager.default.attributesOfItem(atPath: path)[.modificationDate] as? Date)?.timeIntervalSince1970 ?? 0
+        return "\(path)@\(modified)"
+    }
+
     private func updateLaunchAtLogin() {
         do {
             if config.general.launchAtLogin {
+                try? SMAppService.mainApp.unregister()
                 try SMAppService.mainApp.register()
             } else {
                 try SMAppService.mainApp.unregister()
             }
         } catch {
-            config.general.launchAtLogin = SMAppService.mainApp.status == .enabled
+            Self.log.error("Login item update failed: \(error.localizedDescription, privacy: .public)")
         }
+        loginItemStatus = SMAppService.mainApp.status
+        Self.log.info("Login item status: \(String(describing: self.loginItemStatus), privacy: .public)")
     }
+
+    func openLoginItemsSettings() {
+        SMAppService.openSystemSettingsLoginItems()
+    }
+
+    private static let log = Logger(subsystem: "app.jaycemouse.JayceMouse", category: "login-item")
 
     func resetAll() {
         config = AppConfig()

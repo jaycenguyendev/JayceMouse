@@ -152,6 +152,17 @@ struct GeneralView: View {
             Card {
                 VStack(spacing: 10) {
                     SettingToggleRow(symbol: "power", title: "Launch at login", detail: "Start JayceMouse automatically when you sign in.", isOn: $model.config.general.launchAtLogin, tint: Theme.mint)
+                    if model.config.general.launchAtLogin && model.loginItemStatus != .enabled {
+                        HStack(spacing: 10) {
+                            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(Color.orange)
+                            Text(model.loginItemStatus == .requiresApproval
+                                 ? "macOS is blocking JayceMouse from opening at login. Turn it on under Open at Login / Allow in the Background."
+                                 : "macOS has not registered JayceMouse as a login item. Check Login Items in System Settings.")
+                                .font(.system(size: 12)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                            Spacer(minLength: 8)
+                            Button("Open Login Items") { model.openLoginItemsSettings() }.buttonStyle(GradientButtonStyle(prominent: false))
+                        }
+                    }
                     Divider()
                     SettingToggleRow(symbol: "menubar.rectangle", title: "Show menu bar icon", detail: "Quick access to pause features without opening the window.", isOn: $model.config.general.showMenuBarItem, tint: Theme.cyan)
                 }

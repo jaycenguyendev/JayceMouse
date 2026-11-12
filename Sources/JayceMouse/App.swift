@@ -10,6 +10,7 @@ struct JayceMouseApp: App {
         Window("JayceMouse", id: "main") {
             RootView()
                 .environmentObject(AppDelegate.model)
+                .modifier(MainWindowOpener())
                 .frame(minWidth: 980, minHeight: 660)
         }
         .windowStyle(.hiddenTitleBar)
@@ -18,8 +19,20 @@ struct JayceMouseApp: App {
     }
 }
 
+private struct MainWindowOpener: ViewModifier {
+    @Environment(\.openWindow) private var openWindow
+
+    func body(content: Content) -> some View {
+        content.onAppear {
+            AppDelegate.openMainWindowAction = { openWindow(id: "main") }
+            NSApp.setActivationPolicy(.regular)
+        }
+    }
+}
+
 final class AppDelegate: NSObject, NSApplicationDelegate {
     @MainActor static let model = AppModel()
+    @MainActor static var openMainWindowAction: (() -> Void)?
 
     private var statusItem: NSStatusItem?
     private var cancellables = Set<AnyCancellable>()
@@ -31,6 +44,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 .removeDuplicates()
                 .receive(on: RunLoop.main)
                 .sink { [weak self] show in self?.setMenuBarItem(visible: show) }
+                .store(in: &cancellables)
+            NotificationCenter.default.publisher(for: NSWindow.willCloseNotification)
+                .receive(on: RunLoop.main)
+                .sink { [weak self] _ in self?.updateDockPresence() }
                 .store(in: &cancellables)
         }
         #if DEBUG
@@ -75,10 +92,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func showMainWindow() {
+        NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
-        for window in NSApp.windows where window.canBecomeMain {
-            window.makeKeyAndOrderFront(nil)
+        if let open = MainActor.assumeIsolated({ AppDelegate.openMainWindowAction }) {
+            open()
+        } else {
+            for window in NSApp.windows where window.canBecomeMain {
+                window.makeKeyAndOrderFront(nil)
+            }
         }
+    }
+
+    // With the window closed the app keeps running from the menu bar, so drop the Dock icon.
+    // Without a menu bar item the Dock icon is the only way back in, so keep it.
+    private func updateDockPresence() {
+        let hasVisibleWindow = NSApp.windows.contains { $0.canBecomeMain && $0.isVisible }
+        let showMenuBarItem = MainActor.assumeIsolated { AppDelegate.model.config.general.showMenuBarItem }
+        NSApp.setActivationPolicy(!hasVisibleWindow && showMenuBarItem ? .accessory : .regular)
     }
 
     private func setMenuBarItem(visible: Bool) {
