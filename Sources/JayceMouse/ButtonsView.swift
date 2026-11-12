@@ -39,6 +39,8 @@ struct ButtonsView: View {
                         .scaleEffect(0.8)
                         .frame(width: 170, height: 232)
                     VStack(alignment: .leading, spacing: 10) {
+                        connectedMice
+                            .padding(.bottom, 8)
                         Text(tr("Press any button to see it light up", "Nhấn bất kỳ nút nào để thấy nút đó sáng lên"))
                             .font(.system(size: 16, weight: .semibold))
                         Text(tr("Left and right clicks are never remapped on their own — use them as a modifier with a held side button if you want to extend them.",
@@ -120,6 +122,45 @@ struct ButtonsView: View {
         .padding(.vertical, 9)
         .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Color.primary.opacity(hoveredRow == remap.id ? 0.05 : 0)))
         .onHover { hoveredRow = $0 ? remap.id : (hoveredRow == remap.id ? nil : hoveredRow) }
+    }
+
+    @ViewBuilder private var connectedMice: some View {
+        if model.connectedMice.isEmpty {
+            Text(tr("No mouse connected", "Chưa kết nối chuột"))
+                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .foregroundStyle(.secondary)
+        } else {
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(Array(model.connectedMice.enumerated()), id: \.offset) { _, mouse in
+                    HStack(spacing: 12) {
+                        Text(mouse.name)
+                            .font(.system(size: 26, weight: .bold, design: .rounded))
+                            .foregroundStyle(Theme.gradient)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                        batteryBadge(mouse.batteryPercent)
+                    }
+                    .accessibilityElement(children: .combine)
+                }
+            }
+        }
+    }
+
+    private func batteryBadge(_ percent: Int?) -> some View {
+        HStack(spacing: 6) {
+            if let percent {
+                BatteryIcon(percent: percent)
+                Text("\(percent)%").font(.system(size: 13, weight: .semibold).monospacedDigit())
+            } else {
+                Text("—").font(.system(size: 13, weight: .semibold))
+            }
+        }
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(Capsule().fill(Color.primary.opacity(0.07)))
+        .help(percent == nil ? tr("This mouse doesn't report its battery level to macOS.", "Chuột này không báo mức pin cho macOS.") : "")
+        .fixedSize()
     }
 }
 
