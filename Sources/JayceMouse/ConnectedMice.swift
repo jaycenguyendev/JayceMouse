@@ -138,8 +138,14 @@ private final class MouseRowView: NSView {
         let paragraph = NSMutableParagraphStyle()
         paragraph.lineBreakMode = .byTruncatingTail
         let name = NSAttributedString(string: mouse.name, attributes: [.font: font, .foregroundColor: NSColor.labelColor, .paragraphStyle: paragraph])
-        let nameRect = NSRect(x: textX, y: textY(name), width: max(0, right - gap - textX), height: name.size().height)
+        let nameEnd = min(right, bounds.maxX - trailingInset - widestDetail) - gap
+        let nameRect = NSRect(x: textX, y: textY(name), width: max(0, nameEnd - textX), height: name.size().height)
         name.draw(with: nameRect, options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine])
+    }
+
+    // Names stop at the same x on every row, whatever each row's battery text is.
+    private var widestDetail: CGFloat {
+        NSAttributedString(string: "100%", attributes: [.font: font]).size().width + 5 + Self.batteryGlyph(percent: 100).size.width
     }
 
     private func textY(_ text: NSAttributedString) -> CGFloat {
