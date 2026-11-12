@@ -156,6 +156,21 @@ do {
     check(loaded == config, "round-trips through JSON")
     try? FileManager.default.removeItem(at: url)
     check(ConfigStore.load(from: url) == AppConfig(), "missing file yields defaults")
+
+    var vietnamese = AppConfig()
+    vietnamese.general.language = .vietnamese
+    let encoded = try! JSONEncoder().encode(vietnamese)
+    check((try? JSONDecoder().decode(AppConfig.self, from: encoded))?.general.language == .vietnamese, "language round-trips")
+
+    let legacy = #"{"general":{"showMenuBarItem":false,"launchAtLogin":false,"buttonKillSwitch":true,"scrollKillSwitch":false},"remaps":[]}"#
+    let decoded = try? JSONDecoder().decode(AppConfig.self, from: Data(legacy.utf8))
+    check(decoded?.general.buttonKillSwitch == true && decoded?.general.showMenuBarItem == false, "config without newer general keys keeps its values")
+    check(decoded?.general.language == .system && decoded?.general.lockPointerDuringDrag == false, "missing general keys fall back to defaults")
+    check(decoded?.remaps.isEmpty == true, "config without newer general keys keeps its remaps")
+
+    let unknown = #"{"general":{"language":"klingon","buttonKillSwitch":true}}"#
+    let tolerant = try? JSONDecoder().decode(AppConfig.self, from: Data(unknown.utf8))
+    check(tolerant?.general.language == .system && tolerant?.general.buttonKillSwitch == true, "unknown language falls back without losing other settings")
 }
 
 print("\n\(checks - failures)/\(checks) checks passed")

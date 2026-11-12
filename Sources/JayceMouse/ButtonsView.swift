@@ -14,21 +14,21 @@ struct ButtonsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
-            PageHeader(title: "Buttons", subtitle: "Give every extra button its own click, double click, hold, drag or scroll action.") {
+            PageHeader(title: tr("Buttons", "Nút bấm"), subtitle: tr("Give every extra button its own click, double click, hold, drag or scroll action.", "Gán cho mỗi nút phụ thao tác riêng khi nhấn, nhấn đúp, giữ, kéo hoặc cuộn.")) {
                 HStack(spacing: 10) {
                     Menu {
-                        Button("3-button mouse") { model.apply(preset: DefaultRemaps.threeButtons) }
-                        Button("5-button mouse") { model.apply(preset: DefaultRemaps.fiveButtons) }
+                        Button(tr("3-button mouse", "Chuột 3 nút")) { model.apply(preset: DefaultRemaps.threeButtons) }
+                        Button(tr("5-button mouse", "Chuột 5 nút")) { model.apply(preset: DefaultRemaps.fiveButtons) }
                         Divider()
-                        Button("Clear all", role: .destructive) { model.apply(preset: []) }
+                        Button(tr("Clear all", "Xóa tất cả"), role: .destructive) { model.apply(preset: []) }
                     } label: {
-                        Label("Presets", systemImage: "square.stack.3d.up")
+                        Label(tr("Presets", "Mẫu có sẵn"), systemImage: "square.stack.3d.up")
                     }
                     .menuStyle(.button)
                     .buttonStyle(GradientButtonStyle(prominent: false))
                     .fixedSize()
 
-                    Button { editing = EditorRequest(remap: nil) } label: { Label("Add Action", systemImage: "plus") }
+                    Button { editing = EditorRequest(remap: nil) } label: { Label(tr("Add Action", "Thêm thao tác"), systemImage: "plus") }
                         .buttonStyle(GradientButtonStyle())
                 }
             }
@@ -39,9 +39,10 @@ struct ButtonsView: View {
                         .scaleEffect(0.8)
                         .frame(width: 170, height: 232)
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Press any button to see it light up")
+                        Text(tr("Press any button to see it light up", "Nhấn bất kỳ nút nào để thấy nút đó sáng lên"))
                             .font(.system(size: 16, weight: .semibold))
-                        Text("Left and right clicks are never remapped on their own — use them as a modifier with a held side button if you want to extend them.")
+                        Text(tr("Left and right clicks are never remapped on their own — use them as a modifier with a held side button if you want to extend them.",
+                                 "Nút trái và nút phải không bao giờ bị gán lại riêng lẻ — nếu muốn mở rộng, hãy dùng chúng kết hợp khi đang giữ một nút bên."))
                             .font(.system(size: 13))
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -60,8 +61,8 @@ struct ButtonsView: View {
                 Card(padding: 36) {
                     VStack(spacing: 10) {
                         Image(systemName: "cursorarrow.click.badge.clock").font(.system(size: 34)).foregroundStyle(Theme.gradient)
-                        Text("No actions yet").font(.system(size: 16, weight: .semibold))
-                        Text("Add an action or start from a preset.").font(.system(size: 13)).foregroundStyle(.secondary)
+                        Text(tr("No actions yet", "Chưa có thao tác nào")).font(.system(size: 16, weight: .semibold))
+                        Text(tr("Add an action or start from a preset.", "Thêm một thao tác hoặc bắt đầu từ một mẫu có sẵn.")).font(.system(size: 13)).foregroundStyle(.secondary)
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -99,7 +100,7 @@ struct ButtonsView: View {
         HStack(spacing: 12) {
             Chip(symbol: remap.gesture.symbol, title: remap.gesture.title, tint: Theme.violet)
             if let m = remap.modifierButton {
-                Text("+ hold \(buttonName(m))").font(.system(size: 12)).foregroundStyle(.secondary)
+                Text(tr("+ hold \(buttonName(m))", "+ giữ \(buttonName(m))")).font(.system(size: 12)).foregroundStyle(.secondary)
             }
             if !remap.keyboardModifiers.isEmpty {
                 Text("+ \(modifierSymbols(remap.keyboardModifiers))").font(.system(size: 12)).foregroundStyle(.secondary)
@@ -192,7 +193,7 @@ struct RemapEditor: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
-                Text(initial == nil ? "New Action" : "Edit Action")
+                Text(initial == nil ? tr("New Action", "Thao tác mới") : tr("Edit Action", "Sửa thao tác"))
                     .font(.system(size: 22, weight: .bold, design: .rounded))
                 Spacer()
                 Button { dismiss() } label: { Image(systemName: "xmark.circle.fill").font(.system(size: 20)) }
@@ -203,10 +204,10 @@ struct RemapEditor: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 22) {
-                    step("1", "Choose a button") { buttonStep }
-                    step("2", "Choose a trigger") { gestureStep }
-                    step("3", "Add modifiers (optional)") { modifierStep }
-                    step("4", "Choose an action") { effectStep }
+                    step("1", tr("Choose a button", "Chọn nút")) { buttonStep }
+                    step("2", tr("Choose a trigger", "Chọn cách kích hoạt")) { gestureStep }
+                    step("3", tr("Add modifiers (optional)", "Thêm phím bổ trợ (tùy chọn)")) { modifierStep }
+                    step("4", tr("Choose an action", "Chọn thao tác")) { effectStep }
                 }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 12)
@@ -214,9 +215,9 @@ struct RemapEditor: View {
 
             Divider()
             HStack {
-                Button("Cancel") { dismiss() }.buttonStyle(GradientButtonStyle(prominent: false))
+                Button(tr("Cancel", "Hủy")) { dismiss() }.buttonStyle(GradientButtonStyle(prominent: false))
                 Spacer()
-                Button("Save Action") {
+                Button(tr("Save Action", "Lưu thao tác")) {
                     guard let button, let effect else { return }
                     onSave(Remap(id: initial?.id ?? UUID(), button: button, gesture: gesture, modifierButton: modifierButton, keyboardModifiers: keyboardModifiers, effect: effect))
                     dismiss()
@@ -257,20 +258,20 @@ struct RemapEditor: View {
                     .frame(width: 90, height: 122)
                 VStack(alignment: .leading, spacing: 8) {
                     if capturing {
-                        Text("Press a button on your mouse…")
+                        Text(tr("Press a button on your mouse…", "Nhấn một nút trên chuột…"))
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(Theme.violet)
-                        Text(model.trusted ? "Side, middle or extra buttons only." : "Grant Accessibility access first so JayceMouse can see your mouse.")
+                        Text(model.trusted ? tr("Side, middle or extra buttons only.", "Chỉ nút bên, nút giữa hoặc nút phụ.") : tr("Grant Accessibility access first so JayceMouse can see your mouse.", "Hãy cấp quyền Trợ năng trước để JayceMouse nhận được chuột."))
                             .font(.system(size: 12)).foregroundStyle(.secondary)
                     } else if let button {
                         Text(buttonName(button)).font(.system(size: 15, weight: .semibold))
                     } else {
-                        Text("No button selected").font(.system(size: 14)).foregroundStyle(.secondary)
+                        Text(tr("No button selected", "Chưa chọn nút")).font(.system(size: 14)).foregroundStyle(.secondary)
                     }
                     HStack {
-                        Button(capturing ? "Cancel" : (button == nil ? "Detect Button" : "Detect Again")) { toggleCapture() }
+                        Button(capturing ? tr("Cancel", "Hủy") : (button == nil ? tr("Detect Button", "Nhận diện nút") : tr("Detect Again", "Nhận diện lại"))) { toggleCapture() }
                             .buttonStyle(GradientButtonStyle(prominent: !capturing))
-                        Menu("Pick manually") {
+                        Menu(tr("Pick manually", "Chọn thủ công")) {
                             ForEach([2, 3, 4, 5, 6, 7, 8], id: \.self) { b in
                                 Button(buttonName(b)) { button = b }
                             }
@@ -318,7 +319,7 @@ struct RemapEditor: View {
     private var modifierStep: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
-                Text("Keyboard").font(.system(size: 12.5)).foregroundStyle(.secondary).frame(width: 70, alignment: .leading)
+                Text(tr("Keyboard", "Bàn phím")).font(.system(size: 12.5)).foregroundStyle(.secondary).frame(width: 70, alignment: .leading)
                 ForEach([(ModifierMask.control, "⌃ Control"), (.option, "⌥ Option"), (.shift, "⇧ Shift"), (.command, "⌘ Command")], id: \.0.rawValue) { mask, label in
                     Button {
                         if keyboardModifiers.contains(mask) { keyboardModifiers.remove(mask) } else { keyboardModifiers.insert(mask) }
@@ -327,8 +328,8 @@ struct RemapEditor: View {
                 }
             }
             HStack(spacing: 8) {
-                Text("Hold button").font(.system(size: 12.5)).foregroundStyle(.secondary).frame(width: 70, alignment: .leading)
-                Button { modifierButton = nil } label: { Chip(symbol: "xmark", title: "None", selected: modifierButton == nil, tint: Theme.pink) }.buttonStyle(.plain)
+                Text(tr("Hold button", "Giữ nút")).font(.system(size: 12.5)).foregroundStyle(.secondary).frame(width: 70, alignment: .leading)
+                Button { modifierButton = nil } label: { Chip(symbol: "xmark", title: tr("None", "Không"), selected: modifierButton == nil, tint: Theme.pink) }.buttonStyle(.plain)
                 ForEach([2, 3, 4, 5, 6], id: \.self) { b in
                     if b != button {
                         Button { modifierButton = b } label: { Chip(symbol: "computermouse", title: "\(b + 1)", selected: modifierButton == b, tint: Theme.pink) }
@@ -358,7 +359,7 @@ struct RemapEditor: View {
             }
             if !gesture.isContinuous {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("KEYBOARD SHORTCUT").font(.system(size: 11, weight: .bold)).foregroundStyle(.tertiary)
+                    Text(tr("KEYBOARD SHORTCUT", "PHÍM TẮT")).font(.system(size: 11, weight: .bold)).foregroundStyle(.tertiary)
                     HStack(spacing: 10) {
                         Button {
                             recording.toggle()
@@ -372,7 +373,7 @@ struct RemapEditor: View {
                                 recorder.stop()
                             }
                         } label: {
-                            Chip(symbol: "record.circle", title: recording ? "Press a shortcut…" : "Record shortcut", selected: recording, tint: Theme.pink)
+                            Chip(symbol: "record.circle", title: recording ? tr("Press a shortcut…", "Nhấn tổ hợp phím…") : tr("Record shortcut", "Ghi phím tắt"), selected: recording, tint: Theme.pink)
                         }
                         .buttonStyle(.plain)
                         if case .keyboard(let combo)? = effect {

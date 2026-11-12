@@ -5,11 +5,50 @@ import ServiceManagement
 import SwiftUI
 import JayceMouseCore
 
+enum ActivityEvent: Equatable {
+    case pressed(Int)
+    case scroll(ScrollActivity)
+    case action(Effect)
+    case dragStarted
+}
+
 struct ActivityItem: Identifiable {
     let id = UUID()
-    let symbol: String
-    let text: String
+    let event: ActivityEvent
     let date = Date()
+
+    var symbol: String {
+        switch event {
+        case .pressed: return "computermouse"
+        case .scroll: return "arrow.up.and.down"
+        case .action: return "sparkles"
+        case .dragStarted: return "hand.draw"
+        }
+    }
+
+    var text: String {
+        switch event {
+        case .pressed(let button): return tr("\(buttonName(button)) pressed", "Đã nhấn \(buttonName(button))")
+        case .scroll(let kind): return tr("Scroll", "Cuộn") + " · " + kind.title
+        case .action(let effect): return EffectCatalog.title(for: effect)
+        case .dragStarted: return tr("Drag started", "Bắt đầu kéo")
+        }
+    }
+}
+
+extension ScrollActivity {
+    var title: String {
+        switch self {
+        case .zoom: return tr("Zoom", "Thu phóng")
+        case .switchSpace: return tr("Switch space", "Chuyển Space")
+        case .desktopAndLaunchpad: return tr("Desktop & Launchpad", "Màn hình nền & Launchpad")
+        case .horizontal: return tr("Horizontal", "Ngang")
+        case .quick: return tr("Quick", "Nhanh")
+        case .precise: return tr("Precise", "Chính xác")
+        case .direct: return tr("Direct", "Trực tiếp")
+        case .smooth: return tr("Smooth", "Mượt")
+        }
+    }
 }
 
 @MainActor
@@ -24,14 +63,18 @@ final class AppModel: ObservableObject {
     @Published private(set) var scrollPulse = 0
     @Published var captureTarget: ((Int) -> Void)?
     @Published private(set) var loginItemStatus: SMAppService.Status = .notRegistered
+    @Published private(set) var language: UILanguage = .english
+    @Published private(set) var connectedMice: [ConnectedMouse] = []
 
     let engine = InputEngine()
     private let pointer = PointerController()
     private var saveTask: Task<Void, Never>?
     private var permissionTimer: Timer?
+    private var miceTimer: Timer?
 
     init() {
         config = ConfigStore.load()
+        updateLanguage()
         engine.apply(config)
         engine.onActivity = { [weak self] kind in
             DispatchQueue.main.async { self?.record(kind) }
@@ -45,9 +88,18 @@ final class AppModel: ObservableObject {
         permissionTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.refreshPermission() }
         }
+        refreshConnectedMice()
+        miceTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { [weak self] _ in
+            Task { @MainActor in self?.refreshConnectedMice() }
+        }
     }
 
     // MARK: Permission and lifecycle
+
+    func refreshConnectedMice() {
+        let mice = ConnectedMice.current()
+        if mice != connectedMice { connectedMice = mice }
+    }
 
     func refreshPermission() {
         let ok = AXIsProcessTrusted()
@@ -85,6 +137,7 @@ final class AppModel: ObservableObject {
     // MARK: Config
 
     private func configChanged(old: AppConfig) {
+        if old.general.language != config.general.language { updateLanguage() }
         engine.apply(config)
         if old.pointer != config.pointer { pointer.apply(config.pointer) }
         if old.general.launchAtLogin != config.general.launchAtLogin { updateLaunchAtLogin() }
@@ -139,8 +192,15 @@ final class AppModel: ObservableObject {
 
     private static let log = Logger(subsystem: "app.jaycemouse.JayceMouse", category: "login-item")
 
+    private func updateLanguage() {
+        L10n.current = config.general.language.resolved
+        language = L10n.current
+    }
+
     func resetAll() {
-        config = AppConfig()
+        var fresh = AppConfig()
+        fresh.general.language = config.general.language
+        config = fresh
     }
 
     // MARK: Remaps
@@ -183,19 +243,19 @@ final class AppModel: ObservableObject {
         switch kind {
         case .button(let b, let down):
             if down { pressedButtons.insert(b) } else { pressedButtons.remove(b) }
-            if down { push("computermouse", "\(buttonName(b)) pressed") }
-        case .scroll(let text):
+            if down { push(.pressed(b)) }
+        case .scroll(let kind):
             scrollPulse &+= 1
-            if activity.first?.text != "Scroll · \(text)" { push("arrow.up.and.down", "Scroll · \(text)") }
-        case .action(let text):
-            push("sparkles", text)
-        case .drag(let text):
-            push("hand.draw", text)
+            if activity.first?.event != .scroll(kind) { push(.scroll(kind)) }
+        case .action(let effect):
+            push(.action(effect))
+        case .dragStarted:
+            push(.dragStarted)
         }
     }
 
-    private func push(_ symbol: String, _ text: String) {
-        activity.insert(ActivityItem(symbol: symbol, text: text), at: 0)
+    private func push(_ event: ActivityEvent) {
+        activity.insert(ActivityItem(event: event), at: 0)
         if activity.count > 30 { activity.removeLast() }
     }
 }

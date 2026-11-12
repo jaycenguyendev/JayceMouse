@@ -3,9 +3,13 @@ import JayceMouseCore
 
 enum ActivityKind {
     case button(Int, down: Bool)
-    case scroll(String)
-    case action(String)
-    case drag(String)
+    case scroll(ScrollActivity)
+    case action(Effect)
+    case dragStarted
+}
+
+enum ScrollActivity: Equatable {
+    case zoom, switchSpace, desktopAndLaunchpad, horizontal, quick, precise, direct, smooth
 }
 
 /// Smooth-scroll animation driven by a run-loop timer on the tap thread.
@@ -407,28 +411,28 @@ final class InputEngine {
         switch effect {
         case .zoom:
             Synth.postKey(ticks > 0 ? 24 : 27, flags: .command)
-            onActivity?(.scroll("Zoom"))
+            onActivity?(.scroll(.zoom))
         case .spacesSwitch:
             Synth.triggerHotkey(ticks > 0 ? .moveLeftSpace : .moveRightSpace)
-            onActivity?(.scroll("Switch space"))
+            onActivity?(.scroll(.switchSpace))
         case .desktopAndLaunchpad:
             if now - lastPinchFire > 0.7 {
                 lastPinchFire = now
                 Synth.triggerHotkey(ticks > 0 ? .launchpad : .showDesktop)
-                onActivity?(.scroll("Desktop & Launchpad"))
+                onActivity?(.scroll(.desktopAndLaunchpad))
             }
         case .horizontalScroll:
             scroll.addTicks(ticks, horizontalAxis: true, precise: false, quick: false, now: now)
-            onActivity?(.scroll("Horizontal"))
+            onActivity?(.scroll(.horizontal))
         case .quickScroll:
             scroll.addTicks(ticks, horizontalAxis: horizontalTicks != 0 && vertical == 0, precise: false, quick: true, now: now)
-            onActivity?(.scroll("Quick"))
+            onActivity?(.scroll(.quick))
         case .preciseScroll:
             scroll.addTicks(ticks, horizontalAxis: horizontalTicks != 0 && vertical == 0, precise: true, quick: false, now: now)
-            onActivity?(.scroll("Precise"))
+            onActivity?(.scroll(.precise))
         case nil:
             scroll.addTicks(ticks, horizontalAxis: horizontalTicks != 0 && vertical == 0, precise: cfg.scroll.preciseByDefault, quick: false, now: now)
-            onActivity?(.scroll(cfg.scroll.smoothness == .off ? "Direct" : "Smooth"))
+            onActivity?(.scroll(cfg.scroll.smoothness == .off ? .direct : .smooth))
         }
         return nil
     }
@@ -439,12 +443,12 @@ final class InputEngine {
         for action in actions {
             switch action {
             case .perform(let effect):
-                onActivity?(.action(Self.describe(effect)))
+                onActivity?(.action(effect))
                 Synth.perform(effect)
             case .replayClick(let button, let count):
                 Synth.replayClick(button: button, count: count)
             case .dragBegin(let effect, _):
-                onActivity?(.drag("Drag started"))
+                onActivity?(.dragStarted)
                 drag.begin(effect)
                 if cfg.general.lockPointerDuringDrag { lockPointer() }
             case .dragMove(let dx, let dy):
@@ -484,5 +488,4 @@ final class InputEngine {
         wakeTimer = timer
     }
 
-    static func describe(_ effect: Effect) -> String { EffectCatalog.title(for: effect) }
 }

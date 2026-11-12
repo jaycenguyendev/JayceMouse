@@ -143,14 +143,36 @@ public struct PointerSettings: Codable, Equatable {
     public init() {}
 }
 
+public enum AppLanguage: String, Codable, CaseIterable, Hashable {
+    case system, english, vietnamese
+}
+
 public struct GeneralSettings: Codable, Equatable {
     public var showMenuBarItem = true
     public var launchAtLogin = false
     public var buttonKillSwitch = false
     public var scrollKillSwitch = false
     public var lockPointerDuringDrag = false
+    public var language: AppLanguage = .system
 
     public init() {}
+
+    // Synthesized decoding requires every key, so a config written before a field existed
+    // would fail to decode and reset the user's whole configuration.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let defaults = GeneralSettings()
+        showMenuBarItem = try c.decodeIfPresent(Bool.self, forKey: .showMenuBarItem) ?? defaults.showMenuBarItem
+        launchAtLogin = try c.decodeIfPresent(Bool.self, forKey: .launchAtLogin) ?? defaults.launchAtLogin
+        buttonKillSwitch = try c.decodeIfPresent(Bool.self, forKey: .buttonKillSwitch) ?? defaults.buttonKillSwitch
+        scrollKillSwitch = try c.decodeIfPresent(Bool.self, forKey: .scrollKillSwitch) ?? defaults.scrollKillSwitch
+        lockPointerDuringDrag = try c.decodeIfPresent(Bool.self, forKey: .lockPointerDuringDrag) ?? defaults.lockPointerDuringDrag
+        language = (try? c.decodeIfPresent(AppLanguage.self, forKey: .language)) ?? defaults.language
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case showMenuBarItem, launchAtLogin, buttonKillSwitch, scrollKillSwitch, lockPointerDuringDrag, language
+    }
 }
 
 public struct AppConfig: Codable, Equatable {

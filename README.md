@@ -82,4 +82,4 @@ System Settings after rebuilding. Set `SIGN_IDENTITY="<your self-signed cert>"` 
 - Pointer acceleration uses a single system scalar, not MMF's custom acceleration tables.
 - Not included: licensing/payments, auto-update, localization, per-app profiles.
 
-Dev tip: `JAYCEMOUSE_SNAPSHOT_DIR=/path .build/debug/JayceMouse` renders every page to PNG and quits.
+Dev tip: `JAYCEMOUSE_SNAPSHOT_DIR=/path .build/debug/JayceMouse` renders every page, the action editor and the menu bar titles in English and Vietnamese (one subfolder each) and quits.

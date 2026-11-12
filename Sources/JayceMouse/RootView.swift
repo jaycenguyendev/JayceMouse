@@ -6,12 +6,12 @@ enum Page: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .overview: return "Overview"
-        case .buttons: return "Buttons"
-        case .scroll: return "Scrolling"
-        case .pointer: return "Pointer"
-        case .general: return "General"
-        case .about: return "About"
+        case .overview: return tr("Overview", "Tổng quan")
+        case .buttons: return tr("Buttons", "Nút bấm")
+        case .scroll: return tr("Scrolling", "Cuộn")
+        case .pointer: return tr("Pointer", "Con trỏ")
+        case .general: return tr("General", "Cài đặt chung")
+        case .about: return tr("About", "Giới thiệu")
         }
     }
 
@@ -62,6 +62,8 @@ struct RootView: View {
             }
         }
         .animation(.easeOut(duration: 0.22), value: page)
+        .environment(\.locale, model.language.locale)
+        .id(model.language)
     }
 
     private var sidebar: some View {
@@ -123,7 +125,7 @@ struct RootView: View {
                 .fill(active ? Theme.mint : Color.orange)
                 .frame(width: 8, height: 8)
                 .shadow(color: (active ? Theme.mint : Color.orange).opacity(0.8), radius: 4)
-            Text(active ? "Active" : "Needs access")
+            Text(active ? tr("Active", "Đang hoạt động") : tr("Needs access", "Cần cấp quyền"))
                 .font(.system(size: 12.5, weight: .semibold))
             Spacer()
         }

@@ -20,11 +20,10 @@ enum ConnectedMice {
         while case let entry = IOIteratorNext(iterator), entry != 0 {
             defer { IOObjectRelease(entry) }
             guard isExternalPointer(entry), let key = identity(of: entry), seen.insert(key).inserted else { continue }
-            let product = (property(entry, "Product") as? String)?.trimmingCharacters(in: .whitespaces)
-            let name = product?.isEmpty == false ? product! : "Mouse"
+            let product = (property(entry, "Product") as? String)?.trimmingCharacters(in: .whitespaces) ?? ""
             let uniqueID = property(entry, "PhysicalDeviceUniqueID") as? String
-            let percent = battery(of: entry) ?? uniqueID.flatMap { accessories.byID[$0] } ?? accessories.byName[name]
-            mice.append(ConnectedMouse(name: name, batteryPercent: percent))
+            let percent = battery(of: entry) ?? uniqueID.flatMap { accessories.byID[$0] } ?? accessories.byName[product.isEmpty ? "Mouse" : product]
+            mice.append(ConnectedMouse(name: product.isEmpty ? tr("Mouse", "Chuột") : product, batteryPercent: percent))
         }
         return mice.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
@@ -91,7 +90,7 @@ extension ConnectedMouse {
     func menuItem() -> NSMenuItem {
         let item = NSMenuItem(title: name, action: nil, keyEquivalent: "")
         item.view = MouseRowView(mouse: self)
-        item.setAccessibilityLabel(batteryPercent.map { "\(name), battery \($0)%" } ?? name)
+        item.setAccessibilityLabel(batteryPercent.map { tr("\(name), battery \($0)%", "\(name), pin \($0)%") } ?? name)
         return item
     }
 }
@@ -112,7 +111,7 @@ private final class MouseRowView: NSView {
         super.init(frame: NSRect(x: 0, y: 0, width: 120, height: 24))
         autoresizingMask = [.width]
         var tips: [String] = [mouse.name]
-        if mouse.batteryPercent == nil { tips.append("This mouse doesn't report its battery level to macOS.") }
+        if mouse.batteryPercent == nil { tips.append(tr("This mouse doesn't report its battery level to macOS.", "Chuột này không báo mức pin cho macOS.")) }
         toolTip = tips.joined(separator: "\n")
     }
 

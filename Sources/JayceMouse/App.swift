@@ -1,6 +1,7 @@
 import AppKit
 import Combine
 import SwiftUI
+import JayceMouseCore
 
 @main
 struct JayceMouseApp: App {
@@ -61,22 +62,66 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     #if DEBUG
+    // cacheDisplay leaves the main window's page area blank, so pages are drawn from an offscreen RootView.
     private func snapshotPages(into directory: String) {
         let pages = ["overview", "buttons", "scroll", "pointer", "general", "about"]
-        try? FileManager.default.createDirectory(atPath: directory, withIntermediateDirectories: true)
-        func capture(_ index: Int) {
-            guard index < pages.count else { NSApp.terminate(nil); return }
-            UserDefaults.standard.set(pages[index], forKey: "selectedPage")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
-                if let view = NSApp.windows.first(where: { $0.canBecomeMain })?.contentView,
-                   let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) {
-                    view.cacheDisplay(in: view.bounds, to: rep)
-                    try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: "\(directory)/\(pages[index]).png"))
+        let languages: [AppLanguage] = [.english, .vietnamese]
+        let model = MainActor.assumeIsolated { AppDelegate.model }
+        let original = MainActor.assumeIsolated { model.config.general.language }
+        let root = MainActor.assumeIsolated {
+            let view = NSHostingView(rootView: RootView().environmentObject(model).frame(width: 1080, height: 900))
+            view.frame = NSRect(x: 0, y: 0, width: 1080, height: 900)
+            let window = NSWindow(contentRect: view.frame, styleMask: [.borderless], backing: .buffered, defer: false)
+            window.contentView = view
+            return view
+        }
+
+        func write(_ view: NSView, to path: String) {
+            guard let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { return }
+            view.cacheDisplay(in: view.bounds, to: rep)
+            try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: path))
+        }
+
+        func captureExtras(_ folder: String) {
+            MainActor.assumeIsolated {
+                let editor = NSHostingView(rootView: RemapEditor(initial: model.config.remaps.first) { _ in }.environmentObject(model))
+                editor.frame = NSRect(x: 0, y: 0, width: 620, height: 640)
+                let window = NSWindow(contentRect: editor.frame, styleMask: [.borderless], backing: .buffered, defer: false)
+                window.contentView = editor
+                editor.layoutSubtreeIfNeeded()
+                write(editor, to: "\(folder)/editor.png")
+                if let menu = statusItem?.menu {
+                    menuNeedsUpdate(menu)
+                    let titles = menu.items.map { $0.isSeparatorItem ? "---" : ($0.view?.toolTip ?? $0.title) }
+                    try? titles.joined(separator: "\n").write(toFile: "\(folder)/menu.txt", atomically: true, encoding: .utf8)
                 }
-                capture(index + 1)
             }
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { capture(0) }
+
+        func capture(_ languageIndex: Int, _ pageIndex: Int) {
+            guard languageIndex < languages.count else {
+                MainActor.assumeIsolated { model.config.general.language = original }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { NSApp.terminate(nil) }
+                return
+            }
+            let folder = "\(directory)/\(languages[languageIndex].rawValue)"
+            guard pageIndex < pages.count else {
+                captureExtras(folder)
+                capture(languageIndex + 1, 0)
+                return
+            }
+            if pageIndex == 0 {
+                try? FileManager.default.createDirectory(atPath: folder, withIntermediateDirectories: true)
+                MainActor.assumeIsolated { model.config.general.language = languages[languageIndex] }
+            }
+            UserDefaults.standard.set(pages[pageIndex], forKey: "selectedPage")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
+                root.layoutSubtreeIfNeeded()
+                write(root, to: "\(folder)/\(pages[pageIndex]).png")
+                capture(languageIndex, pageIndex + 1)
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { capture(0, 0) }
     }
     #endif
 
@@ -121,22 +166,39 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         item.button?.image = NSImage(systemSymbolName: "computermouse.fill", accessibilityDescription: "JayceMouse")
         let menu = NSMenu()
-        menu.addItem(withTitle: "Open JayceMouse", action: #selector(showMainWindow), keyEquivalent: "")
+        menu.addItem(withTitle: "", action: #selector(showMainWindow), keyEquivalent: "")
         menu.addItem(.separator())
-        let buttons = NSMenuItem(title: "Pause Button Actions", action: #selector(toggleButtons(_:)), keyEquivalent: "")
-        let scroll = NSMenuItem(title: "Pause Scroll Enhancements", action: #selector(toggleScroll(_:)), keyEquivalent: "")
-        menu.addItem(buttons)
-        menu.addItem(scroll)
+        menu.addItem(withTitle: "", action: #selector(toggleButtons(_:)), keyEquivalent: "")
+        menu.addItem(withTitle: "", action: #selector(toggleScroll(_:)), keyEquivalent: "")
         menu.addItem(.separator())
-        menu.addItem(withTitle: "Quit JayceMouse", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        let languages = NSMenu()
+        for language in AppLanguage.allCases {
+            let choice = NSMenuItem(title: "", action: #selector(selectLanguage(_:)), keyEquivalent: "")
+            choice.representedObject = language.rawValue
+            choice.target = self
+            languages.addItem(choice)
+        }
+        let languageItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
+        languageItem.tag = Self.languageItemTag
+        languageItem.image = NSImage(systemSymbolName: "globe", accessibilityDescription: nil)
+        languageItem.submenu = languages
+        menu.addItem(languageItem)
+        menu.addItem(.separator())
+        menu.addItem(withTitle: "", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         menu.items.forEach { $0.target = $0.action == #selector(NSApplication.terminate(_:)) ? NSApp : self }
         menu.delegate = self
+        localizeTitles(in: menu)
         item.menu = menu
         statusItem = item
     }
 
     @objc private func toggleButtons(_ sender: NSMenuItem) {
         MainActor.assumeIsolated { AppDelegate.model.config.general.buttonKillSwitch.toggle() }
+    }
+
+    @objc private func selectLanguage(_ sender: NSMenuItem) {
+        guard let raw = sender.representedObject as? String, let language = AppLanguage(rawValue: raw) else { return }
+        MainActor.assumeIsolated { AppDelegate.model.config.general.language = language }
     }
 
     @objc private func toggleScroll(_ sender: NSMenuItem) {
@@ -146,6 +208,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 extension AppDelegate: NSMenuDelegate {
     func menuNeedsUpdate(_ menu: NSMenu) {
+        localizeTitles(in: menu)
         MainActor.assumeIsolated {
             let general = AppDelegate.model.config.general
             menu.items.first { $0.action == #selector(toggleButtons(_:)) }?.state = general.buttonKillSwitch ? .on : .off
@@ -155,12 +218,33 @@ extension AppDelegate: NSMenuDelegate {
     }
 
     private static let mouseItemTag = 7_401
+    private static let languageItemTag = 7_402
+
+    fileprivate func localizeTitles(in menu: NSMenu) {
+        for item in menu.items {
+            switch item.action {
+            case #selector(showMainWindow): item.title = tr("Open JayceMouse", "Mở JayceMouse")
+            case #selector(toggleButtons(_:)): item.title = tr("Pause Button Actions", "Tạm dừng thao tác nút")
+            case #selector(toggleScroll(_:)): item.title = tr("Pause Scroll Enhancements", "Tạm dừng tăng cường cuộn")
+            case #selector(NSApplication.terminate(_:)): item.title = tr("Quit JayceMouse", "Thoát JayceMouse")
+            default: break
+            }
+        }
+        guard let languageItem = menu.items.first(where: { $0.tag == Self.languageItemTag }) else { return }
+        languageItem.title = tr("Language", "Ngôn ngữ")
+        let current = MainActor.assumeIsolated { AppDelegate.model.config.general.language }
+        for choice in languageItem.submenu?.items ?? [] {
+            guard let language = (choice.representedObject as? String).flatMap(AppLanguage.init(rawValue:)) else { continue }
+            choice.title = language.displayName
+            choice.state = language == current ? .on : .off
+        }
+    }
 
     private func refreshMouseItems(in menu: NSMenu) {
         menu.items.filter { $0.tag == Self.mouseItemTag }.forEach(menu.removeItem)
         var items = ConnectedMice.current().map { $0.menuItem() }
         if items.isEmpty {
-            items = [NSMenuItem(title: "No mouse connected", action: nil, keyEquivalent: "")]
+            items = [NSMenuItem(title: tr("No mouse connected", "Chưa kết nối chuột"), action: nil, keyEquivalent: "")]
         }
         items.append(.separator())
         for (index, item) in items.enumerated() {

@@ -3,10 +3,10 @@ import JayceMouseCore
 
 private func caption(_ smoothness: ScrollSmoothness) -> String {
     switch smoothness {
-    case .off: return "Raw scroll wheel steps, only with the speed and direction you choose."
-    case .low: return "Short, snappy glide that stops quickly."
-    case .regular: return "Balanced glide — comfortable for documents and the web."
-    case .high: return "Long, silky inertia like an Apple trackpad."
+    case .off: return tr("Raw scroll wheel steps, only with the speed and direction you choose.", "Bước cuộn gốc của bánh xe, chỉ áp dụng tốc độ và hướng bạn chọn.")
+    case .low: return tr("Short, snappy glide that stops quickly.", "Lướt ngắn, gọn và dừng nhanh.")
+    case .regular: return tr("Balanced glide — comfortable for documents and the web.", "Lướt cân bằng — dễ chịu khi đọc tài liệu và lướt web.")
+    case .high: return tr("Long, silky inertia like an Apple trackpad.", "Quán tính dài, mượt như trackpad của Apple.")
     }
 }
 
@@ -15,21 +15,21 @@ struct ScrollSettingsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
-            PageHeader(title: "Scrolling", subtitle: "Make a plain scroll wheel glide like a trackpad.")
+            PageHeader(title: tr("Scrolling", "Cuộn"), subtitle: tr("Make a plain scroll wheel glide like a trackpad.", "Giúp bánh xe cuộn thường lướt mượt như trackpad."))
 
             Card {
                 VStack(alignment: .leading, spacing: 18) {
-                    SettingToggleRow(symbol: "wind", title: "Enhance scrolling", detail: "Turn off to hand scrolling back to macOS.", isOn: $model.config.scroll.enabled, tint: Theme.cyan)
+                    SettingToggleRow(symbol: "wind", title: tr("Enhance scrolling", "Tăng cường cuộn"), detail: tr("Turn off to hand scrolling back to macOS.", "Tắt để trả việc cuộn lại cho macOS."), isOn: $model.config.scroll.enabled, tint: Theme.cyan)
                     Divider()
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Smoothness").font(.system(size: 14, weight: .semibold))
-                        SegmentedPills(options: ScrollSmoothness.allCases, selection: $model.config.scroll.smoothness) { $0.rawValue.capitalized }
+                        Text(tr("Smoothness", "Độ mượt")).font(.system(size: 14, weight: .semibold))
+                        SegmentedPills(options: ScrollSmoothness.allCases, selection: $model.config.scroll.smoothness) { $0.title }
                         Text(caption(model.config.scroll.smoothness)).font(.system(size: 12.5)).foregroundStyle(.secondary)
                     }
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Speed").font(.system(size: 14, weight: .semibold))
-                        SegmentedPills(options: ScrollSpeed.allCases, selection: $model.config.scroll.speed) { $0.rawValue.capitalized }
-                        Text("Scroll faster and the distance accelerates automatically.").font(.system(size: 12.5)).foregroundStyle(.secondary)
+                        Text(tr("Speed", "Tốc độ")).font(.system(size: 14, weight: .semibold))
+                        SegmentedPills(options: ScrollSpeed.allCases, selection: $model.config.scroll.speed) { $0.title }
+                        Text(tr("Scroll faster and the distance accelerates automatically.", "Cuộn càng nhanh, quãng đường càng tự động tăng tốc.")).font(.system(size: 12.5)).foregroundStyle(.secondary)
                     }
                 }
             }
@@ -37,23 +37,23 @@ struct ScrollSettingsView: View {
 
             Card {
                 VStack(spacing: 10) {
-                    SettingToggleRow(symbol: "arrow.up.arrow.down", title: "Reverse direction", detail: "Flip the direction macOS gives the scroll wheel. Off follows your System Settings.", isOn: $model.config.scroll.reverseDirection, tint: Theme.pink)
+                    SettingToggleRow(symbol: "arrow.up.arrow.down", title: tr("Reverse direction", "Đảo chiều cuộn"), detail: tr("Flip the direction macOS gives the scroll wheel. Off follows your System Settings.", "Đảo hướng cuộn mà macOS áp dụng cho bánh xe. Khi tắt sẽ theo Cài đặt hệ thống."), isOn: $model.config.scroll.reverseDirection, tint: Theme.pink)
                     Divider()
-                    SettingToggleRow(symbol: "hand.draw", title: "Trackpad simulation", detail: "Sends trackpad-style phases so apps use rubber banding and momentum.", isOn: $model.config.scroll.trackpadSimulation, tint: Theme.violet)
+                    SettingToggleRow(symbol: "hand.draw", title: tr("Trackpad simulation", "Giả lập trackpad"), detail: tr("Sends trackpad-style phases so apps use rubber banding and momentum.", "Gửi các pha cuộn như trackpad để ứng dụng có hiệu ứng nảy và quán tính."), isOn: $model.config.scroll.trackpadSimulation, tint: Theme.violet)
                     Divider()
-                    SettingToggleRow(symbol: "tortoise", title: "Precise by default", detail: "Smaller steps for detail work. Hold ⌥ Option for this on demand.", isOn: $model.config.scroll.preciseByDefault, tint: Theme.mint)
+                    SettingToggleRow(symbol: "tortoise", title: tr("Precise by default", "Mặc định cuộn chính xác"), detail: tr("Smaller steps for detail work. Hold ⌥ Option for this on demand.", "Bước nhỏ hơn cho công việc tỉ mỉ. Giữ ⌥ Option để dùng khi cần."), isOn: $model.config.scroll.preciseByDefault, tint: Theme.mint)
                 }
             }
             .opacity(model.config.scroll.enabled ? 1 : 0.55)
 
             Card {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Hold a key while scrolling").font(.system(size: 14, weight: .semibold))
+                    Text(tr("Hold a key while scrolling", "Giữ phím khi cuộn")).font(.system(size: 14, weight: .semibold))
                     HStack(spacing: 10) {
-                        shortcutChip("⇧ Shift", "Horizontal")
-                        shortcutChip("⌃ Control", "Quick")
-                        shortcutChip("⌥ Option", "Precise")
-                        shortcutChip("⌘ Command", "Zoom")
+                        shortcutChip("⇧ Shift", ScrollActivity.horizontal.title)
+                        shortcutChip("⌃ Control", ScrollActivity.quick.title)
+                        shortcutChip("⌥ Option", ScrollActivity.precise.title)
+                        shortcutChip("⌘ Command", ScrollActivity.zoom.title)
                     }
                 }
             }
@@ -81,9 +81,9 @@ struct ScrollPlayground: View {
         Card(padding: 0) {
             VStack(alignment: .leading, spacing: 0) {
                 HStack {
-                    Label("Try it here", systemImage: "hand.point.up.left.fill").font(.system(size: 14, weight: .semibold))
+                    Label(tr("Try it here", "Thử ở đây"), systemImage: "hand.point.up.left.fill").font(.system(size: 14, weight: .semibold))
                     Spacer()
-                    Text("Scroll with your mouse wheel").font(.system(size: 12)).foregroundStyle(.secondary)
+                    Text(tr("Scroll with your mouse wheel", "Cuộn bằng bánh xe chuột")).font(.system(size: 12)).foregroundStyle(.secondary)
                 }
                 .padding(20)
                 Divider()
@@ -94,7 +94,7 @@ struct ScrollPlayground: View {
                                 .fill(colors[i % colors.count].gradient.opacity(0.85))
                                 .frame(height: 64)
                                 .overlay(alignment: .leading) {
-                                    Text("Row \(i + 1)").font(.system(size: 15, weight: .bold, design: .rounded)).foregroundStyle(.white).padding(.leading, 20)
+                                    Text(tr("Row \(i + 1)", "Hàng \(i + 1)")).font(.system(size: 15, weight: .bold, design: .rounded)).foregroundStyle(.white).padding(.leading, 20)
                                 }
                         }
                     }
@@ -111,15 +111,16 @@ struct PointerView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
-            PageHeader(title: "Pointer", subtitle: "Tune how the cursor tracks your mouse.")
+            PageHeader(title: tr("Pointer", "Con trỏ"), subtitle: tr("Tune how the cursor tracks your mouse.", "Điều chỉnh cách con trỏ bám theo chuột."))
 
             Card {
                 VStack(alignment: .leading, spacing: 20) {
-                    SettingToggleRow(symbol: "gearshape.2", title: "Use system settings", detail: "Leave pointer speed and acceleration exactly as macOS has them.", isOn: $model.config.pointer.useSystemAcceleration, tint: Theme.violet)
+                    SettingToggleRow(symbol: "gearshape.2", title: tr("Use system settings", "Dùng cài đặt hệ thống"), detail: tr("Leave pointer speed and acceleration exactly as macOS has them.", "Giữ nguyên tốc độ và gia tốc con trỏ như macOS đang đặt."), isOn: $model.config.pointer.useSystemAcceleration, tint: Theme.violet)
                     Divider()
-                    slider(title: "Sensitivity", value: $model.config.pointer.sensitivity, low: "Slow", high: "Fast")
-                    slider(title: "Acceleration", value: $model.config.pointer.acceleration, low: "Linear", high: "Strong")
-                    Text("Acceleration at the lowest setting makes the pointer move 1:1 with your hand. Changes apply to the system mouse speed while JayceMouse is running and are restored when you quit.")
+                    slider(title: tr("Sensitivity", "Độ nhạy"), value: $model.config.pointer.sensitivity, low: tr("Slow", "Chậm"), high: tr("Fast", "Nhanh"))
+                    slider(title: tr("Acceleration", "Gia tốc"), value: $model.config.pointer.acceleration, low: tr("Linear", "Tuyến tính"), high: tr("Strong", "Mạnh"))
+                    Text(tr("Acceleration at the lowest setting makes the pointer move 1:1 with your hand. Changes apply to the system mouse speed while JayceMouse is running and are restored when you quit.",
+                             "Gia tốc ở mức thấp nhất giúp con trỏ di chuyển đúng 1:1 theo tay bạn. Thay đổi áp dụng cho tốc độ chuột của hệ thống khi JayceMouse đang chạy và được khôi phục khi bạn thoát."))
                         .font(.system(size: 12.5)).foregroundStyle(.secondary)
                 }
             }
@@ -147,34 +148,54 @@ struct GeneralView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
-            PageHeader(title: "General", subtitle: "Startup, menu bar and safety switches.")
+            PageHeader(title: tr("General", "Cài đặt chung"), subtitle: tr("Startup, menu bar, language and safety switches.", "Khởi động, thanh menu, ngôn ngữ và công tắc an toàn."))
 
             Card {
-                VStack(spacing: 10) {
-                    SettingToggleRow(symbol: "power", title: "Launch at login", detail: "Start JayceMouse automatically when you sign in.", isOn: $model.config.general.launchAtLogin, tint: Theme.mint)
-                    if model.config.general.launchAtLogin && model.loginItemStatus != .enabled {
-                        HStack(spacing: 10) {
-                            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(Color.orange)
-                            Text(model.loginItemStatus == .requiresApproval
-                                 ? "macOS is blocking JayceMouse from opening at login. Turn it on under Open at Login / Allow in the Background."
-                                 : "macOS has not registered JayceMouse as a login item. Check Login Items in System Settings.")
-                                .font(.system(size: 12)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
-                            Spacer(minLength: 8)
-                            Button("Open Login Items") { model.openLoginItemsSettings() }.buttonStyle(GradientButtonStyle(prominent: false))
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(spacing: 14) {
+                        Image(systemName: "globe")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .frame(width: 34, height: 34)
+                            .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Theme.violet.gradient))
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(tr("Language", "Ngôn ngữ")).font(.system(size: 14, weight: .semibold))
+                            Text(tr("Changes the app and menu bar text right away.", "Đổi ngôn ngữ của ứng dụng và menu trên thanh menu ngay lập tức."))
+                                .font(.system(size: 12)).foregroundStyle(.secondary)
                         }
                     }
-                    Divider()
-                    SettingToggleRow(symbol: "menubar.rectangle", title: "Show menu bar icon", detail: "Quick access to pause features without opening the window.", isOn: $model.config.general.showMenuBarItem, tint: Theme.cyan)
+                    SegmentedPills(options: AppLanguage.allCases, selection: $model.config.general.language) { $0.displayName }
                 }
             }
 
             Card {
                 VStack(spacing: 10) {
-                    SettingToggleRow(symbol: "cursorarrow.click.2", title: "Disable button actions", detail: "Temporarily pass every button straight through to macOS.", isOn: $model.config.general.buttonKillSwitch, tint: Theme.pink)
+                    SettingToggleRow(symbol: "power", title: tr("Launch at login", "Mở khi đăng nhập"), detail: tr("Start JayceMouse automatically when you sign in.", "Tự động mở JayceMouse khi bạn đăng nhập."), isOn: $model.config.general.launchAtLogin, tint: Theme.mint)
+                    if model.config.general.launchAtLogin && model.loginItemStatus != .enabled {
+                        HStack(spacing: 10) {
+                            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(Color.orange)
+                            Text(model.loginItemStatus == .requiresApproval
+                                 ? tr("macOS is blocking JayceMouse from opening at login. Turn it on under Open at Login / Allow in the Background.",
+                                      "macOS đang chặn JayceMouse mở khi đăng nhập. Hãy bật trong Mở khi đăng nhập / Cho phép chạy nền.")
+                                 : tr("macOS has not registered JayceMouse as a login item. Check Login Items in System Settings.",
+                                      "macOS chưa đăng ký JayceMouse làm mục đăng nhập. Hãy kiểm tra Mục đăng nhập trong Cài đặt hệ thống."))
+                                .font(.system(size: 12)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                            Spacer(minLength: 8)
+                            Button(tr("Open Login Items", "Mở Mục đăng nhập")) { model.openLoginItemsSettings() }.buttonStyle(GradientButtonStyle(prominent: false))
+                        }
+                    }
                     Divider()
-                    SettingToggleRow(symbol: "wind", title: "Disable scroll enhancements", detail: "Temporarily hand scrolling back to macOS.", isOn: $model.config.general.scrollKillSwitch, tint: Theme.pink)
+                    SettingToggleRow(symbol: "menubar.rectangle", title: tr("Show menu bar icon", "Hiện biểu tượng trên thanh menu"), detail: tr("Quick access to pause features without opening the window.", "Truy cập nhanh để tạm dừng tính năng mà không cần mở cửa sổ."), isOn: $model.config.general.showMenuBarItem, tint: Theme.cyan)
+                }
+            }
+
+            Card {
+                VStack(spacing: 10) {
+                    SettingToggleRow(symbol: "cursorarrow.click.2", title: tr("Disable button actions", "Tắt thao tác nút"), detail: tr("Temporarily pass every button straight through to macOS.", "Tạm thời chuyển thẳng mọi nút cho macOS xử lý."), isOn: $model.config.general.buttonKillSwitch, tint: Theme.pink)
                     Divider()
-                    SettingToggleRow(symbol: "lock", title: "Lock pointer during drag", detail: "Freeze the cursor while a Click & Drag gesture is active.", isOn: $model.config.general.lockPointerDuringDrag, tint: Theme.violet)
+                    SettingToggleRow(symbol: "wind", title: tr("Disable scroll enhancements", "Tắt tăng cường cuộn"), detail: tr("Temporarily hand scrolling back to macOS.", "Tạm thời trả việc cuộn lại cho macOS."), isOn: $model.config.general.scrollKillSwitch, tint: Theme.pink)
+                    Divider()
+                    SettingToggleRow(symbol: "lock", title: tr("Lock pointer during drag", "Khóa con trỏ khi kéo"), detail: tr("Freeze the cursor while a Click & Drag gesture is active.", "Giữ yên con trỏ khi đang thực hiện cử chỉ Nhấn & Kéo."), isOn: $model.config.general.lockPointerDuringDrag, tint: Theme.violet)
                 }
             }
 
@@ -184,27 +205,27 @@ struct GeneralView: View {
                         .font(.system(size: 22))
                         .foregroundStyle(model.trusted ? Theme.mint : Color.orange)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Accessibility access").font(.system(size: 14, weight: .semibold))
-                        Text(model.trusted ? "Granted — JayceMouse can see and adjust your mouse." : "Not granted — nothing will work until you allow it.")
+                        Text(tr("Accessibility access", "Quyền Trợ năng")).font(.system(size: 14, weight: .semibold))
+                        Text(model.trusted ? tr("Granted — JayceMouse can see and adjust your mouse.", "Đã cấp — JayceMouse có thể nhận và điều chỉnh chuột của bạn.") : tr("Not granted — nothing will work until you allow it.", "Chưa cấp — mọi tính năng sẽ không hoạt động cho tới khi bạn cho phép."))
                             .font(.system(size: 12.5)).foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Button("Open Settings") { model.openAccessibilitySettings() }.buttonStyle(GradientButtonStyle(prominent: false))
+                    Button(tr("Open Settings", "Mở Cài đặt")) { model.openAccessibilitySettings() }.buttonStyle(GradientButtonStyle(prominent: false))
                 }
             }
 
             HStack(spacing: 10) {
-                Button("Reveal config file") {
+                Button(tr("Reveal config file", "Hiện tệp cấu hình")) {
                     NSWorkspace.shared.activateFileViewerSelecting([ConfigStore.fileURL])
                 }
                 .buttonStyle(GradientButtonStyle(prominent: false))
-                Button("Reset everything…") { confirmReset = true }
+                Button(tr("Reset everything…", "Đặt lại tất cả…")) { confirmReset = true }
                     .buttonStyle(GradientButtonStyle(prominent: false))
             }
-            .confirmationDialog("Reset all JayceMouse settings?", isPresented: $confirmReset) {
-                Button("Reset", role: .destructive) { model.resetAll() }
+            .confirmationDialog(tr("Reset all JayceMouse settings?", "Đặt lại toàn bộ cài đặt JayceMouse?"), isPresented: $confirmReset) {
+                Button(tr("Reset", "Đặt lại"), role: .destructive) { model.resetAll() }
             } message: {
-                Text("Buttons, scrolling, pointer and general settings return to their defaults.")
+                Text(tr("Buttons, scrolling, pointer and general settings return to their defaults. Your language choice is kept.", "Nút bấm, cuộn, con trỏ và cài đặt chung sẽ về mặc định. Lựa chọn ngôn ngữ được giữ nguyên."))
             }
         }
     }
@@ -213,7 +234,7 @@ struct GeneralView: View {
 struct AboutView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
-            PageHeader(title: "About", subtitle: "A modern take on a great idea.")
+            PageHeader(title: tr("About", "Giới thiệu"), subtitle: tr("A modern take on a great idea.", "Một cách làm hiện đại cho một ý tưởng tuyệt vời."))
             Card(padding: 32) {
                 HStack(spacing: 24) {
                     Image(systemName: "computermouse.fill")
@@ -224,9 +245,9 @@ struct AboutView: View {
                         .shadow(color: Theme.violet.opacity(0.4), radius: 16, y: 8)
                     VStack(alignment: .leading, spacing: 6) {
                         Text("JayceMouse").font(.system(size: 26, weight: .bold, design: .rounded))
-                        Text("Version \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev")")
+                        Text(tr("Version", "Phiên bản") + " " + (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev"))
                             .font(.system(size: 13)).foregroundStyle(.secondary)
-                        Text("Smooth scrolling, trackpad-style gestures and fully custom buttons for any mouse.")
+                        Text(tr("Smooth scrolling, trackpad-style gestures and fully custom buttons for any mouse.", "Cuộn mượt, cử chỉ như trackpad và nút bấm tùy chỉnh hoàn toàn cho mọi loại chuột."))
                             .font(.system(size: 13.5)).foregroundStyle(.secondary)
                     }
                 }
@@ -234,23 +255,24 @@ struct AboutView: View {
             Card {
                 HStack(spacing: 16) {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Enjoying JayceMouse?").font(.system(size: 14, weight: .semibold))
-                        Text("It is free and always will be. A coffee keeps the updates coming.")
+                        Text(tr("Enjoying JayceMouse?", "Bạn thích JayceMouse?")).font(.system(size: 14, weight: .semibold))
+                        Text(tr("It is free and always will be. A coffee keeps the updates coming.", "Ứng dụng miễn phí và sẽ luôn miễn phí. Một ly cà phê giúp các bản cập nhật tiếp tục ra đời."))
                             .font(.system(size: 13)).foregroundStyle(.secondary)
                     }
                     Spacer()
                     Link(destination: URL(string: "https://jaycemouse.vercel.app/#support")!) {
-                        Label("Buy me a coffee", systemImage: "cup.and.saucer.fill")
+                        Label(tr("Buy me a coffee", "Mời tôi một ly cà phê"), systemImage: "cup.and.saucer.fill")
                             .font(.system(size: 13, weight: .semibold))
                     }
                 }
             }
             Card {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Acknowledgements").font(.system(size: 14, weight: .semibold))
-                    Text("JayceMouse is inspired by Mac Mouse Fix by Noah Nuebling. It is an independent implementation written from scratch and shares no code or assets with it.")
+                    Text(tr("Acknowledgements", "Ghi nhận")).font(.system(size: 14, weight: .semibold))
+                    Text(tr("JayceMouse is inspired by Mac Mouse Fix by Noah Nuebling. It is an independent implementation written from scratch and shares no code or assets with it.",
+                             "JayceMouse lấy cảm hứng từ Mac Mouse Fix của Noah Nuebling. Đây là bản hiện thực độc lập, viết lại từ đầu và không dùng chung mã nguồn hay tài nguyên nào."))
                         .font(.system(size: 13)).foregroundStyle(.secondary)
-                    Link("Mac Mouse Fix on GitHub", destination: URL(string: "https://github.com/noah-nuebling/mac-mouse-fix")!)
+                    Link(tr("Mac Mouse Fix on GitHub", "Mac Mouse Fix trên GitHub"), destination: URL(string: "https://github.com/noah-nuebling/mac-mouse-fix")!)
                         .font(.system(size: 13, weight: .semibold))
                 }
             }

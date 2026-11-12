@@ -13,49 +13,49 @@ enum EffectCatalog {
         case .hotkey(let h):
             switch h {
             case .missionControl: return "Mission Control"
-            case .appExpose: return "App Exposé"
-            case .showDesktop: return "Show Desktop"
+            case .appExpose: return tr("App Exposé", "Exposé ứng dụng")
+            case .showDesktop: return tr("Show Desktop", "Hiển thị màn hình nền")
             case .spotlight: return "Spotlight"
-            case .lookUp: return "Look Up & Data Detectors"
-            case .appSwitcher: return "App Switcher"
-            case .moveLeftSpace: return "Move Left a Space"
-            case .moveRightSpace: return "Move Right a Space"
+            case .lookUp: return tr("Look Up & Data Detectors", "Tra cứu & Bộ phát hiện dữ liệu")
+            case .appSwitcher: return tr("App Switcher", "Trình chuyển ứng dụng")
+            case .moveLeftSpace: return tr("Move Left a Space", "Sang Space bên trái")
+            case .moveRightSpace: return tr("Move Right a Space", "Sang Space bên phải")
             case .launchpad: return "Launchpad"
-            case .notificationCenter: return "Notification Center"
-            case .doNotDisturb: return "Do Not Disturb"
+            case .notificationCenter: return tr("Notification Center", "Trung tâm thông báo")
+            case .doNotDisturb: return tr("Do Not Disturb", "Không làm phiền")
             case .siri: return "Siri"
             }
-        case .smartZoom: return "Smart Zoom (experimental)"
+        case .smartZoom: return tr("Smart Zoom (experimental)", "Thu phóng thông minh (thử nghiệm)")
         case .keyboard(let combo): return KeyNames.describe(combo)
-        case .mouseButton(let b): return b == 2 ? "Middle Click" : "Button \(b + 1) Click"
+        case .mouseButton(let b): return b == 2 ? tr("Middle Click", "Nhấn chuột giữa") : tr("Button \(b + 1) Click", "Nhấn nút \(b + 1)")
         case .system(let k):
             switch k {
-            case .brightnessUp: return "Brightness Up"
-            case .brightnessDown: return "Brightness Down"
-            case .volumeUp: return "Volume Up"
-            case .volumeDown: return "Volume Down"
-            case .mute: return "Mute"
-            case .playPause: return "Play / Pause"
-            case .nextTrack: return "Next Track"
-            case .previousTrack: return "Previous Track"
-            case .keyboardBrightnessUp: return "Keyboard Backlight Up"
-            case .keyboardBrightnessDown: return "Keyboard Backlight Down"
+            case .brightnessUp: return tr("Brightness Up", "Tăng độ sáng")
+            case .brightnessDown: return tr("Brightness Down", "Giảm độ sáng")
+            case .volumeUp: return tr("Volume Up", "Tăng âm lượng")
+            case .volumeDown: return tr("Volume Down", "Giảm âm lượng")
+            case .mute: return tr("Mute", "Tắt tiếng")
+            case .playPause: return tr("Play / Pause", "Phát / Tạm dừng")
+            case .nextTrack: return tr("Next Track", "Bài tiếp theo")
+            case .previousTrack: return tr("Previous Track", "Bài trước")
+            case .keyboardBrightnessUp: return tr("Keyboard Backlight Up", "Tăng đèn bàn phím")
+            case .keyboardBrightnessDown: return tr("Keyboard Backlight Down", "Giảm đèn bàn phím")
             }
-        case .back: return "Back"
-        case .forward: return "Forward"
+        case .back: return tr("Back", "Quay lại")
+        case .forward: return tr("Forward", "Tiến tới")
         case .drag(let d):
             switch d {
-            case .twoFingerSwipe: return "Scroll & Navigate"
-            case .threeFingerSwipe: return "Spaces & Mission Control"
+            case .twoFingerSwipe: return tr("Scroll & Navigate", "Cuộn & Điều hướng")
+            case .threeFingerSwipe: return tr("Spaces & Mission Control", "Spaces & Mission Control")
             }
         case .scroll(let s):
             switch s {
-            case .zoom: return "Zoom"
-            case .horizontalScroll: return "Horizontal Scroll"
-            case .quickScroll: return "Quick Scroll"
-            case .preciseScroll: return "Precise Scroll"
-            case .spacesSwitch: return "Switch Spaces"
-            case .desktopAndLaunchpad: return "Desktop & Launchpad"
+            case .zoom: return tr("Zoom", "Thu phóng")
+            case .horizontalScroll: return tr("Horizontal Scroll", "Cuộn ngang")
+            case .quickScroll: return tr("Quick Scroll", "Cuộn nhanh")
+            case .preciseScroll: return tr("Precise Scroll", "Cuộn chính xác")
+            case .spacesSwitch: return tr("Switch Spaces", "Chuyển Space")
+            case .desktopAndLaunchpad: return tr("Desktop & Launchpad", "Màn hình nền & Launchpad")
             }
         }
     }
@@ -109,9 +109,9 @@ enum EffectCatalog {
     static func groups(for gesture: ButtonGesture) -> [EffectGroup] {
         switch gesture {
         case .drag:
-            return [EffectGroup(title: "Gestures", effects: DragEffect.allCases.map { .drag($0) })]
+            return [EffectGroup(title: tr("Gestures", "Cử chỉ"), effects: DragEffect.allCases.map { .drag($0) })]
         case .scroll:
-            return [EffectGroup(title: "While scrolling", effects: ScrollEffect.allCases.map { .scroll($0) })]
+            return [EffectGroup(title: tr("While scrolling", "Khi cuộn"), effects: ScrollEffect.allCases.map { .scroll($0) })]
         default:
             return [
                 EffectGroup(title: "macOS", effects: [
@@ -120,9 +120,9 @@ enum EffectCatalog {
                     .hotkey(.lookUp), .smartZoom,
                 ]),
                 EffectGroup(title: "Spaces", effects: [.hotkey(.moveLeftSpace), .hotkey(.moveRightSpace)]),
-                EffectGroup(title: "Navigation", effects: [.back, .forward]),
-                EffectGroup(title: "Media & Display", effects: SystemKey.allCases.map { .system($0) }),
-                EffectGroup(title: "Mouse", effects: [.mouseButton(2)]),
+                EffectGroup(title: tr("Navigation", "Điều hướng"), effects: [.back, .forward]),
+                EffectGroup(title: tr("Media & Display", "Đa phương tiện & Màn hình"), effects: SystemKey.allCases.map { .system($0) }),
+                EffectGroup(title: tr("Mouse", "Chuột"), effects: [.mouseButton(2)]),
             ]
         }
     }
@@ -146,19 +146,19 @@ enum KeyNames {
         if combo.modifiers.contains(.option) { out += "⌥" }
         if combo.modifiers.contains(.shift) { out += "⇧" }
         if combo.modifiers.contains(.command) { out += "⌘" }
-        return out + (names[combo.keyCode] ?? "Key \(combo.keyCode)")
+        return out + (names[combo.keyCode] ?? tr("Key \(combo.keyCode)", "Phím \(combo.keyCode)"))
     }
 }
 
 extension ButtonGesture {
     var title: String {
         switch self {
-        case .click: return "Click"
-        case .doubleClick: return "Double Click"
-        case .tripleClick: return "Triple Click"
-        case .hold: return "Hold"
-        case .drag: return "Click & Drag"
-        case .scroll: return "Click & Scroll"
+        case .click: return tr("Click", "Nhấn")
+        case .doubleClick: return tr("Double Click", "Nhấn đúp")
+        case .tripleClick: return tr("Triple Click", "Nhấn ba lần")
+        case .hold: return tr("Hold", "Giữ")
+        case .drag: return tr("Click & Drag", "Nhấn & Kéo")
+        case .scroll: return tr("Click & Scroll", "Nhấn & Cuộn")
         }
     }
 
@@ -174,11 +174,32 @@ extension ButtonGesture {
     }
 }
 
+extension ScrollSmoothness {
+    var title: String {
+        switch self {
+        case .off: return tr("Off", "Tắt")
+        case .low: return tr("Low", "Thấp")
+        case .regular: return tr("Regular", "Vừa")
+        case .high: return tr("High", "Cao")
+        }
+    }
+}
+
+extension ScrollSpeed {
+    var title: String {
+        switch self {
+        case .low: return tr("Low", "Chậm")
+        case .medium: return tr("Medium", "Vừa")
+        case .high: return tr("High", "Nhanh")
+        }
+    }
+}
+
 func buttonName(_ button: Int) -> String {
     switch button {
-    case 0: return "Left Button"
-    case 1: return "Right Button"
-    case 2: return "Middle Button"
-    default: return "Button \(button + 1)"
+    case 0: return tr("Left Button", "Nút trái")
+    case 1: return tr("Right Button", "Nút phải")
+    case 2: return tr("Middle Button", "Nút giữa")
+    default: return tr("Button \(button + 1)", "Nút \(button + 1)")
     }
 }
