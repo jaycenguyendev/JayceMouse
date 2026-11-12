@@ -50,6 +50,7 @@ cat > "$APP/Contents/Info.plist" <<EOF
     <key>LSMinimumSystemVersion</key><string>14.0</string>
     <key>NSPrincipalClass</key><string>NSApplication</string>
     <key>NSHighResolutionCapable</key><true/>
+    <key>NSBluetoothAlwaysUsageDescription</key><string>JayceMouse reads the battery level of your Bluetooth mouse and keyboard to show it in the menu bar.</string>
 </dict>
 </plist>
 EOF

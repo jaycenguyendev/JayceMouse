@@ -6,12 +6,12 @@ enum Page: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .overview: return "Overview"
-        case .buttons: return "Buttons"
-        case .scroll: return "Scrolling"
-        case .pointer: return "Pointer"
-        case .general: return "General"
-        case .about: return "About"
+        case .overview: return tr("Overview")
+        case .buttons: return tr("Buttons")
+        case .scroll: return tr("Scrolling")
+        case .pointer: return tr("Pointer")
+        case .general: return tr("General")
+        case .about: return tr("About")
         }
     }
 
@@ -62,6 +62,8 @@ struct RootView: View {
             }
         }
         .animation(.easeOut(duration: 0.22), value: page)
+        // Rebuild every screen when the interface language changes.
+        .id(model.config.general.language)
     }
 
     private var sidebar: some View {
@@ -72,7 +74,7 @@ struct RootView: View {
                     .foregroundStyle(.white)
                     .frame(width: 34, height: 34)
                     .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Theme.gradient))
-                Text("JayceMouse")
+                Text(tr("JayceMouse"))
                     .font(.system(size: 17, weight: .bold, design: .rounded))
             }
             .padding(.leading, 10)
@@ -116,19 +118,37 @@ struct RootView: View {
         .overlay(alignment: .trailing) { Rectangle().fill(Color.primary.opacity(0.07)).frame(width: 1) }
     }
 
+    @ViewBuilder
     private var statusPill: some View {
         let active = model.trusted && model.engineRunning
-        return HStack(spacing: 8) {
+        if active {
+            pillContent(active: true)
+        } else {
+            // Not allowed yet: the pill becomes a button that opens the Accessibility settings.
+            Button { model.openAccessibilitySettings() } label: { pillContent(active: false) }
+                .buttonStyle(.plain)
+                .help(tr("Open %@ and switch JayceMouse on.", AppModel.accessibilitySettingsPath))
+        }
+    }
+
+    private func pillContent(active: Bool) -> some View {
+        HStack(spacing: 8) {
             Circle()
                 .fill(active ? Theme.mint : Color.orange)
                 .frame(width: 8, height: 8)
                 .shadow(color: (active ? Theme.mint : Color.orange).opacity(0.8), radius: 4)
-            Text(active ? "Active" : "Needs access")
+            Text(tr(active ? "Active" : "Needs access"))
                 .font(.system(size: 12.5, weight: .semibold))
             Spacer()
+            if !active {
+                Image(systemName: "arrow.up.forward.app")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Color.orange)
+            }
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .background(Capsule(style: .continuous).fill(Color.primary.opacity(0.07)))
+        .background(Capsule(style: .continuous).fill(active ? Color.primary.opacity(0.07) : Color.orange.opacity(0.15)))
+        .contentShape(Capsule())
     }
 }

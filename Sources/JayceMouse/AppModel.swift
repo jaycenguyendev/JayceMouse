@@ -25,11 +25,13 @@ final class AppModel: ObservableObject {
 
     let engine = InputEngine()
     private let pointer = PointerController()
+    private let dialogSnapper = DialogSnapper()
     private var saveTask: Task<Void, Never>?
     private var permissionTimer: Timer?
 
     init() {
         config = ConfigStore.load()
+        L10n.language = config.general.language
         engine.apply(config)
         engine.onActivity = { [weak self] kind in
             DispatchQueue.main.async { self?.record(kind) }
@@ -60,6 +62,15 @@ final class AppModel: ObservableObject {
         } else {
             engineRunning = engine.isRunning
         }
+        updateDialogSnapper()
+    }
+
+    func testDialogSnap() {
+        dialogSnapper.showTestAlert()
+    }
+
+    private func updateDialogSnapper() {
+        dialogSnapper.setEnabled(trusted && config.general.snapToDefaultButton)
     }
 
     func requestPermission() {
@@ -67,13 +78,31 @@ final class AppModel: ObservableObject {
         _ = AXIsProcessTrustedWithOptions(options)
     }
 
+    /// Where the Accessibility switch lives in this macOS version, for on-screen instructions.
+    static var accessibilitySettingsPath: String {
+        let major = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
+        if major >= 27 {
+            return "System Settings → Privacy & Security → Device Control and Data Access → Accessibility"
+        }
+        return "System Settings → Privacy & Security → Accessibility"
+    }
+
+    /// Opens the Accessibility list in System Settings. The address of that page differs between macOS
+    /// versions, so try the newest one first and fall back to older ones, then to Privacy & Security itself.
     func openAccessibilitySettings() {
-        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
-            NSWorkspace.shared.open(url)
+        let candidates = [
+            "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Accessibility",
+            "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
+            "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension",
+            "x-apple.systempreferences:com.apple.preference.security",
+        ]
+        for candidate in candidates {
+            if let url = URL(string: candidate), NSWorkspace.shared.open(url) { return }
         }
     }
 
     func shutdown() {
+        dialogSnapper.stop()
         engine.stop()
         pointer.restore()
         ConfigStore.save(config)
@@ -82,9 +111,11 @@ final class AppModel: ObservableObject {
     // MARK: Config
 
     private func configChanged(old: AppConfig) {
+        L10n.language = config.general.language
         engine.apply(config)
         if old.pointer != config.pointer { pointer.apply(config.pointer) }
         if old.general.launchAtLogin != config.general.launchAtLogin { updateLaunchAtLogin() }
+        if old.general.snapToDefaultButton != config.general.snapToDefaultButton { updateDialogSnapper() }
         saveTask?.cancel()
         saveTask = Task { [config] in
             try? await Task.sleep(nanoseconds: 350_000_000)
@@ -149,14 +180,15 @@ final class AppModel: ObservableObject {
         switch kind {
         case .button(let b, let down):
             if down { pressedButtons.insert(b) } else { pressedButtons.remove(b) }
-            if down { push("computermouse", "\(buttonName(b)) pressed") }
+            if down { push("computermouse", tr("%@ pressed", buttonName(b))) }
         case .scroll(let text):
             scrollPulse &+= 1
-            if activity.first?.text != "Scroll · \(text)" { push("arrow.up.and.down", "Scroll · \(text)") }
+            let line = tr("Scroll") + " · " + tr(text)
+            if activity.first?.text != line { push("arrow.up.and.down", line) }
         case .action(let text):
             push("sparkles", text)
         case .drag(let text):
-            push("hand.draw", text)
+            push("hand.draw", tr(text))
         }
     }
 

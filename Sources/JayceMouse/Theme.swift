@@ -54,9 +54,9 @@ struct PageHeader<Trailing: View>: View {
     var body: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 6) {
-                Text(title)
+                Text(tr(title))
                     .font(.system(size: 30, weight: .bold, design: .rounded))
-                Text(subtitle)
+                Text(tr(subtitle))
                     .font(.system(size: 14))
                     .foregroundStyle(.secondary)
             }
@@ -99,7 +99,7 @@ struct Chip: View {
     var body: some View {
         HStack(spacing: 7) {
             Image(systemName: symbol).font(.system(size: 12, weight: .semibold))
-            Text(title).font(.system(size: 12.5, weight: .medium)).lineLimit(1)
+            Text(tr(title)).font(.system(size: 12.5, weight: .medium)).lineLimit(1)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
@@ -125,7 +125,7 @@ struct SegmentedPills<Value: Hashable>: View {
                 Button {
                     withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) { selection = option }
                 } label: {
-                    Text(title(option))
+                    Text(tr(title(option)))
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(selection == option ? Color.white : Color.primary.opacity(0.75))
                         .frame(maxWidth: .infinity)
@@ -159,9 +159,9 @@ struct SettingToggleRow: View {
                 .frame(width: 34, height: 34)
                 .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(tint.gradient))
             VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.system(size: 14, weight: .semibold))
+                Text(tr(title)).font(.system(size: 14, weight: .semibold))
                 if let detail {
-                    Text(detail).font(.system(size: 12)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                    Text(tr(detail)).font(.system(size: 12)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                 }
             }
             Spacer(minLength: 12)

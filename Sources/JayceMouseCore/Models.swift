@@ -143,14 +143,54 @@ public struct PointerSettings: Codable, Equatable {
     public init() {}
 }
 
+public enum AppLanguage: String, Codable, CaseIterable {
+    case english = "en"
+    case vietnamese = "vi"
+}
+
 public struct GeneralSettings: Codable, Equatable {
     public var showMenuBarItem = true
     public var launchAtLogin = false
     public var buttonKillSwitch = false
     public var scrollKillSwitch = false
     public var lockPointerDuringDrag = false
+    /// Move the pointer onto a dialog's default button (OK, Save, Allow…) when the dialog appears.
+    public var snapToDefaultButton = true
+    /// Battery levels in the menu bar menu, chosen separately for mice and keyboards.
+    /// Off by default: not every device reports one.
+    public var showMouseBattery = false
+    public var showKeyboardBattery = false
+    public var language: AppLanguage = .english
 
     public init() {}
+
+    // Missing keys fall back to defaults, so config files saved by older versions keep loading.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let d = GeneralSettings()
+        showMenuBarItem = try c.decodeIfPresent(Bool.self, forKey: .showMenuBarItem) ?? d.showMenuBarItem
+        launchAtLogin = try c.decodeIfPresent(Bool.self, forKey: .launchAtLogin) ?? d.launchAtLogin
+        buttonKillSwitch = try c.decodeIfPresent(Bool.self, forKey: .buttonKillSwitch) ?? d.buttonKillSwitch
+        scrollKillSwitch = try c.decodeIfPresent(Bool.self, forKey: .scrollKillSwitch) ?? d.scrollKillSwitch
+        lockPointerDuringDrag = try c.decodeIfPresent(Bool.self, forKey: .lockPointerDuringDrag) ?? d.lockPointerDuringDrag
+        snapToDefaultButton = try c.decodeIfPresent(Bool.self, forKey: .snapToDefaultButton) ?? d.snapToDefaultButton
+        // Earlier builds had one switch for all battery levels; carry it over to both.
+        let legacy = try decoder.container(keyedBy: LegacyKeys.self)
+        let showBatteries = try legacy.decodeIfPresent(Bool.self, forKey: .showBatteryLevels)
+        showMouseBattery = try c.decodeIfPresent(Bool.self, forKey: .showMouseBattery) ?? showBatteries ?? d.showMouseBattery
+        showKeyboardBattery = try c.decodeIfPresent(Bool.self, forKey: .showKeyboardBattery) ?? showBatteries ?? d.showKeyboardBattery
+        language = (try? c.decodeIfPresent(AppLanguage.self, forKey: .language)) ?? d.language
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case showMenuBarItem, launchAtLogin, buttonKillSwitch, scrollKillSwitch, lockPointerDuringDrag, snapToDefaultButton
+        case showMouseBattery, showKeyboardBattery, language
+    }
+
+    private enum LegacyKeys: String, CodingKey { case showBatteryLevels }
+
+    /// True when battery levels are shown for any kind of device.
+    public var showsAnyBattery: Bool { showMouseBattery || showKeyboardBattery }
 }
 
 public struct AppConfig: Codable, Equatable {

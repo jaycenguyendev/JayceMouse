@@ -27,7 +27,6 @@
 <meta name="twitter:description" content="Smooth scrolling, trackpad-style gestures and custom buttons for any mouse on macOS.">
 <meta name="twitter:image" content="https://jaycemouse.vercel.app/media/og-image.jpg">
 <meta name="theme-color" content="#0b0c10">
-<link rel="preload" as="image" href="media/jaycemouse-launch-poster.jpg">
 <link rel="apple-touch-icon" href="media/apple-touch-icon.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23735CFA'/%3E%3Cstop offset='1' stop-color='%231ABDEB'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='21' y='13' width='22' height='38' rx='11' fill='white'/%3E%3Crect x='30.5' y='18' width='3' height='9' rx='1.5' fill='%23735CFA'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -103,7 +102,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .nav .btn { height: 40px; padding: 0 18px; font-size: 14px; }
 
 /* Hero */
-.hero { position: relative; padding: 56px 0 0; text-align: center; }
+.hero { position: relative; padding: 88px 0 0; text-align: center; }
 .hero::before {
   content: ""; position: absolute; inset: -120px 0 auto; height: 620px; pointer-events: none;
   background:
@@ -112,8 +111,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .badge { position: relative; display: inline-flex; align-items: center; gap: 10px; padding: 5px 14px 5px 5px; border-radius: 999px; background: rgba(255,255,255,.04); border: 1px solid var(--line-strong); font-size: 13.5px; color: var(--muted); font-weight: 500; }
 .badge b { padding: 3px 10px; border-radius: 999px; background: var(--brand); color: #fff; font-size: 12px; font-weight: 700; }
-.hero h1 { position: relative; font-size: clamp(42px, min(7.4vw, 9.5vh), 84px); line-height: 1.02; letter-spacing: -.035em; font-weight: 800; margin: 20px auto 16px; max-width: 900px; }
-.hero .lead { position: relative; color: var(--muted); font-size: clamp(16px, 2vw, 19px); max-width: 600px; margin: 0 auto 26px; }
+.hero h1 { position: relative; font-size: clamp(42px, 7.4vw, 84px); line-height: 1.02; letter-spacing: -.035em; font-weight: 800; margin: 26px auto 20px; max-width: 900px; }
+.hero .lead { position: relative; color: var(--muted); font-size: clamp(16px, 2vw, 19px); max-width: 600px; margin: 0 auto 34px; }
 .hero-ctas { position: relative; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 .hero-note { position: relative; margin-top: 16px; font-size: 13px; color: var(--faint); }
 
@@ -272,16 +271,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 /* Launch video */
 .video-frame { position: relative; aspect-ratio: 16 / 9; border-radius: 28px; overflow: hidden; background: #000; border: 1px solid var(--line-strong); box-shadow: 0 60px 140px -50px rgba(115,92,250,.65), 0 40px 100px -40px rgba(0,0,0,.9); }
-.hero .video-frame { width: min(1040px, 100%); margin: 32px auto 0; scroll-margin-top: 96px; }
-
-/* Floating Buy me a coffee */
-.coffee-fab { position: fixed; right: 22px; bottom: 22px; z-index: 60; display: inline-flex; align-items: center; gap: 9px; height: 48px; padding: 0 20px 0 14px; border-radius: 999px; background: linear-gradient(135deg, #ffd166, #ff9f43); color: #2a1a05; font-size: 14.5px; font-weight: 800; box-shadow: 0 14px 34px -10px rgba(255,159,67,.75), 0 0 0 1px rgba(255,255,255,.25) inset; animation: coffeeBob 3.2s ease-in-out infinite; transition: opacity .3s, transform .3s, box-shadow .2s; }
-.coffee-fab:hover { animation-play-state: paused; box-shadow: 0 18px 40px -8px rgba(255,159,67,.95), 0 0 0 1px rgba(255,255,255,.35) inset; }
-.coffee-fab .cup { font-size: 20px; line-height: 1; animation: coffeeTilt 3.2s ease-in-out infinite; }
-.coffee-fab.hide { opacity: 0; transform: translateY(16px) scale(.9); pointer-events: none; }
-@keyframes coffeeBob { 0%,100% { translate: 0 0; } 50% { translate: 0 -7px; } }
-@keyframes coffeeTilt { 0%,100% { rotate: -8deg; } 50% { rotate: 8deg; } }
-@media (max-width: 680px) { .coffee-fab { right: 14px; bottom: 14px; height: 42px; padding: 0 16px 0 12px; font-size: 13px; } }
 .video-frame video { display: block; width: 100%; height: 100%; object-fit: cover; }
 .sound { position: absolute; right: 18px; bottom: 18px; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.22); background: rgba(12,13,18,.55); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); font-size: 13.5px; font-weight: 700; transition: background .2s; }
 .sound:hover { background: rgba(12,13,18,.8); }
@@ -638,10 +627,6 @@ footer a:hover { color: var(--text); }
         <a class="btn btn-ghost" href="https://github.com/jaycenguyendev/JayceMouse"><svg><use href="#i-github"/></svg>View on GitHub</a>
       </div>
       <p class="hero-note">macOS 14 Sonoma or later · Apple silicon &amp; Intel · MIT licensed</p>
-      <div class="video-frame" id="watch">
-        <video id="launch" src="media/jaycemouse-launch.mp4" poster="media/jaycemouse-launch-poster.jpg" autoplay muted loop playsinline preload="auto" aria-label="JayceMouse launch video"></video>
-        <button class="sound" id="sound" aria-pressed="false"><svg><use href="#i-sound-off"/></svg><span>Sound on</span></button>
-      </div>
     </div>
 
     <div class="stage" id="stage">
@@ -711,6 +696,20 @@ footer a:hover { color: var(--text); }
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="watch">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Watch</span>
+        <h2>30 seconds to<br><span class="grad-text">a free trackpad.</span></h2>
+        <p>Install it, then hold the middle button and drag. That's the whole trick.</p>
+      </div>
+      <div class="video-frame reveal">
+        <video id="launch" src="media/jaycemouse-launch.mp4" poster="media/jaycemouse-launch-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="JayceMouse launch video"></video>
+        <button class="sound" id="sound" aria-pressed="false"><svg><use href="#i-sound-off"/></svg><span>Sound on</span></button>
       </div>
     </div>
   </section>
@@ -954,8 +953,6 @@ footer a:hover { color: var(--text); }
   </section>
 </main>
 
-<a class="coffee-fab" id="coffee-fab" href="#support"><span class="cup" aria-hidden="true">☕</span>Buy me a coffee</a>
-
 <footer>
   <div class="wrap">
     <a class="logo" href="#top"><span class="logo-mark"><i></i></span>JayceMouse</a>
@@ -1150,12 +1147,8 @@ footer a:hover { color: var(--text); }
   else {
     new IntersectionObserver(([e]) => {
       if (e.isIntersecting) launch.play().catch(() => {}); else launch.pause();
-    }, { threshold: .15 }).observe(launch);
+    }, { threshold: .35 }).observe(launch);
   }
-
-  const coffeeFab = document.getElementById('coffee-fab');
-  new IntersectionObserver(([e]) => coffeeFab.classList.toggle('hide', e.isIntersecting), { threshold: .2 })
-    .observe(document.getElementById('support'));
 
   // Reveal on scroll
   const io = new IntersectionObserver(entries => entries.forEach(e => {

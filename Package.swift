@@ -13,6 +13,7 @@ let package = Package(
             linkerSettings: [
                 .linkedFramework("IOKit"),
                 .linkedFramework("ServiceManagement"),
+                .linkedFramework("CoreBluetooth"),
             ]
         ),
         .executableTarget(name: "CoreSelfTest", dependencies: ["JayceMouseCore"], path: "Sources/CoreSelfTest"),
