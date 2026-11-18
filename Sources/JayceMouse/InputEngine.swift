@@ -211,6 +211,9 @@ final class InputEngine {
     private var captureSwallowUp: Int?
     private var pointerLocked = false
     private var lastPinchFire: TimeInterval = 0
+    /// Scroll-to-zoom is sent as one pinch gesture that ends shortly after the last wheel tick.
+    private var zoomGestureActive = false
+    private var zoomEndTimer: CFRunLoopTimer?
     private var eventCount = 0
     private let stateLock = NSLock()
 
@@ -410,7 +413,11 @@ final class InputEngine {
 
         switch effect {
         case .zoom:
-            Synth.postKey(ticks > 0 ? 24 : 27, flags: .command)
+            if cfg.scroll.zoomStyle == .keyboard {
+                Synth.postKey(ticks > 0 ? 24 : 27, flags: .command)
+            } else {
+                pinchZoom(ticks: ticks)
+            }
             onActivity?(.scroll(.zoom))
         case .spacesSwitch:
             Synth.triggerHotkey(ticks > 0 ? .moveLeftSpace : .moveRightSpace)
@@ -470,6 +477,27 @@ final class InputEngine {
         guard pointerLocked else { return }
         CGAssociateMouseAndMouseCursorPosition(1)
         pointerLocked = false
+    }
+
+    /// Wheel ticks become steps of a pinch: began on the first tick, changed for each tick,
+    /// ended once the wheel has been still for a moment. Runs on the tap thread.
+    private func pinchZoom(ticks: Double) {
+        if !zoomGestureActive {
+            Synth.postMagnification(0, phase: Synth.phaseBegan)
+            zoomGestureActive = true
+        }
+        let step = max(-3, min(3, ticks)) * 0.08
+        Synth.postMagnification(step, phase: Synth.phaseChanged)
+
+        if let zoomEndTimer { CFRunLoopTimerInvalidate(zoomEndTimer) }
+        let timer = CFRunLoopTimerCreateWithHandler(nil, CFAbsoluteTimeGetCurrent() + 0.25, 0, 0, 0) { [weak self] _ in
+            guard let self, self.zoomGestureActive else { return }
+            self.zoomGestureActive = false
+            self.zoomEndTimer = nil
+            Synth.postMagnification(0, phase: Synth.phaseEnded)
+        }
+        CFRunLoopAddTimer(CFRunLoopGetCurrent(), timer, .commonModes)
+        zoomEndTimer = timer
     }
 
     private func schedule(wake: TimeInterval?, now: TimeInterval) {

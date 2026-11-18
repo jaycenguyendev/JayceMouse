@@ -118,9 +118,21 @@ struct RootView: View {
         .overlay(alignment: .trailing) { Rectangle().fill(Color.primary.opacity(0.07)).frame(width: 1) }
     }
 
+    @ViewBuilder
     private var statusPill: some View {
         let active = model.trusted && model.engineRunning
-        return HStack(spacing: 8) {
+        if active {
+            pillContent(active: true)
+        } else {
+            // Not allowed yet: the pill opens the Accessibility settings.
+            Button { model.openAccessibilitySettings() } label: { pillContent(active: false) }
+                .buttonStyle(.plain)
+                .help(tr("Open the Accessibility settings and switch JayceMouse on.", "Mở cài đặt Trợ năng và bật JayceMouse."))
+        }
+    }
+
+    private func pillContent(active: Bool) -> some View {
+        HStack(spacing: 8) {
             Circle()
                 .fill(active ? Theme.mint : Color.orange)
                 .frame(width: 8, height: 8)
@@ -128,9 +140,15 @@ struct RootView: View {
             Text(active ? tr("Active", "Đang hoạt động") : tr("Needs access", "Cần cấp quyền"))
                 .font(.system(size: 12.5, weight: .semibold))
             Spacer()
+            if !active {
+                Image(systemName: "arrow.up.forward.app")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Color.orange)
+            }
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .background(Capsule(style: .continuous).fill(Color.primary.opacity(0.07)))
+        .background(Capsule(style: .continuous).fill(active ? Color.primary.opacity(0.07) : Color.orange.opacity(0.15)))
+        .contentShape(Capsule())
     }
 }

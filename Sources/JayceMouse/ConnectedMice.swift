@@ -5,34 +5,49 @@ import IOKit.ps
 struct ConnectedMouse: Equatable {
     let name: String
     let batteryPercent: Int?
+    var isKeyboard = false
 }
 
 enum ConnectedMice {
     // Reads registry properties only. Opening the HID devices would require Input Monitoring.
-    static func current() -> [ConnectedMouse] {
+    // Keyboards are listed after the mice so their battery shows too.
+    static func current(mice includeMice: Bool = true, keyboards includeKeyboards: Bool = false) -> [ConnectedMouse] {
         var iterator: io_iterator_t = 0
         guard IOServiceGetMatchingServices(kIOMainPortDefault, IOServiceMatching("IOHIDDevice"), &iterator) == KERN_SUCCESS else { return [] }
         defer { IOObjectRelease(iterator) }
 
         let accessories = AccessoryBatteries.current()
-        var seen = Set<String>()
-        var mice: [ConnectedMouse] = []
+        var mice: [String: ConnectedMouse] = [:]
+        var keyboards: [String: ConnectedMouse] = [:]
         while case let entry = IOIteratorNext(iterator), entry != 0 {
             defer { IOObjectRelease(entry) }
-            guard isExternalPointer(entry), let key = identity(of: entry), seen.insert(key).inserted else { continue }
+            let pointer = isExternalDevice(entry, usage: 2)
+            guard pointer || isExternalDevice(entry, usage: 6), let key = identity(of: entry) else { continue }
             let product = (property(entry, "Product") as? String)?.trimmingCharacters(in: .whitespaces) ?? ""
+            let fallback = pointer ? "Mouse" : "Keyboard"
             let uniqueID = property(entry, "PhysicalDeviceUniqueID") as? String
-            let percent = battery(of: entry) ?? uniqueID.flatMap { accessories.byID[$0] } ?? accessories.byName[product.isEmpty ? "Mouse" : product]
-            mice.append(ConnectedMouse(name: product.isEmpty ? tr("Mouse", "Chuột") : product, batteryPercent: percent))
+            let percent = battery(of: entry) ?? uniqueID.flatMap { accessories.byID[$0] } ?? accessories.byName[product.isEmpty ? fallback : product]
+            let name = product.isEmpty ? (pointer ? tr("Mouse", "Chuột") : tr("Keyboard", "Bàn phím")) : product
+            if pointer {
+                if mice[key] == nil { mice[key] = ConnectedMouse(name: name, batteryPercent: percent) }
+            } else if keyboards[key] == nil {
+                keyboards[key] = ConnectedMouse(name: name, batteryPercent: percent, isKeyboard: true)
+            }
         }
-        return mice.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+        // A mouse often also exposes a keyboard interface for its extra buttons; list it once, as a mouse.
+        for key in mice.keys { keyboards[key] = nil }
+        let byName: (ConnectedMouse, ConnectedMouse) -> Bool = { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+        return (includeMice ? mice.values.sorted(by: byName) : []) + (includeKeyboards ? keyboards.values.sorted(by: byName) : [])
     }
 
     // Matching on PrimaryUsage misses combo devices that report as a keyboard first.
-    private static func isExternalPointer(_ entry: io_registry_entry_t) -> Bool {
+    // Usage 2 is a mouse, 6 a keyboard (generic desktop page). Virtual devices from other apps are skipped.
+    private static func isExternalDevice(_ entry: io_registry_entry_t, usage: Int) -> Bool {
         if (property(entry, "Built-In") as? Bool) == true { return false }
+        let transport = (property(entry, "Transport") as? String ?? "").lowercased()
+        if transport.contains("virtual") { return false }
         guard let pairs = property(entry, "DeviceUsagePairs") as? [[String: Any]] else { return false }
-        return pairs.contains { ($0["DeviceUsagePage"] as? Int) == 1 && ($0["DeviceUsage"] as? Int) == 2 }
+        return pairs.contains { ($0["DeviceUsagePage"] as? Int) == 1 && ($0["DeviceUsage"] as? Int) == usage }
     }
 
     private static func identity(of entry: io_registry_entry_t) -> String? {
@@ -111,7 +126,11 @@ private final class MouseRowView: NSView {
         super.init(frame: NSRect(x: 0, y: 0, width: 120, height: 24))
         autoresizingMask = [.width]
         var tips: [String] = [mouse.name]
-        if mouse.batteryPercent == nil { tips.append(tr("This mouse doesn't report its battery level to macOS.", "Chuột này không báo mức pin cho macOS.")) }
+        if mouse.batteryPercent == nil {
+            tips.append(mouse.isKeyboard
+                        ? tr("This keyboard doesn't report its battery level to macOS.", "Bàn phím này không báo mức pin cho macOS.")
+                        : tr("This mouse doesn't report its battery level to macOS.", "Chuột này không báo mức pin cho macOS."))
+        }
         toolTip = tips.joined(separator: "\n")
     }
 
@@ -129,7 +148,7 @@ private final class MouseRowView: NSView {
         right -= detail.size().width
         detail.draw(at: NSPoint(x: right, y: textY(detail)))
 
-        if let symbol = NSImage(systemSymbolName: "computermouse.fill", accessibilityDescription: nil)?
+        if let symbol = NSImage(systemSymbolName: mouse.isKeyboard ? "keyboard.fill" : "computermouse.fill", accessibilityDescription: nil)?
             .withSymbolConfiguration(.init(pointSize: font.pointSize, weight: .regular).applying(.init(hierarchicalColor: .labelColor))) {
             symbol.draw(in: NSRect(x: iconX, y: (bounds.height - symbol.size.height) / 2, width: symbol.size.width, height: symbol.size.height))
         }

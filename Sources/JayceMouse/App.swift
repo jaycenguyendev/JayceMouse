@@ -26,7 +26,7 @@ private struct MainWindowOpener: ViewModifier {
     func body(content: Content) -> some View {
         content.onAppear {
             AppDelegate.openMainWindowAction = { openWindow(id: "main") }
-            NSApp.setActivationPolicy(.regular)
+            if !AppDelegate.hidingLaunchWindow { NSApp.setActivationPolicy(.regular) }
         }
     }
 }
@@ -35,8 +35,40 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @MainActor static let model = AppModel()
     @MainActor static var openMainWindowAction: (() -> Void)?
 
+    /// True for the first moments after launch while the window should stay hidden (start in the menu bar).
+    static var hidingLaunchWindow = false
+
     private var statusItem: NSStatusItem?
     private var cancellables = Set<AnyCancellable>()
+    /// The window SwiftUI opened at launch and that was hidden; shown again from the menu bar.
+    private weak var launchHiddenWindow: NSWindow?
+
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        let (general, trusted) = MainActor.assumeIsolated {
+            (AppDelegate.model.config.general, AppDelegate.model.trusted)
+        }
+        let debugRun = CommandLine.arguments.contains("--e2e")
+            || ProcessInfo.processInfo.environment["JAYCEMOUSE_SNAPSHOT_DIR"] != nil
+        // Start in the menu bar only, unless the window is wanted, there is no menu bar icon to open it
+        // from, or Accessibility access is still missing (the window explains how to grant it).
+        guard !general.showWindowAtLaunch, general.showMenuBarItem, trusted, !debugRun else { return }
+        AppDelegate.hidingLaunchWindow = true
+        NSApp.setActivationPolicy(.accessory)
+        // SwiftUI opens its window a moment after launch; hide it whenever it shows up during that time.
+        for delay in [0.05, 0.2, 0.5, 1.0, 1.5] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in self?.hideLaunchWindow() }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { AppDelegate.hidingLaunchWindow = false }
+    }
+
+    private func hideLaunchWindow() {
+        guard AppDelegate.hidingLaunchWindow else { return }
+        for window in NSApp.windows where window.isVisible && window.styleMask.contains(.titled) && !(window is NSPanel) {
+            window.orderOut(nil)
+            launchHiddenWindow = window
+        }
+        NSApp.setActivationPolicy(.accessory)
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         MainActor.assumeIsolated {
@@ -137,9 +169,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func showMainWindow() {
+        AppDelegate.hidingLaunchWindow = false
         NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
-        if let open = MainActor.assumeIsolated({ AppDelegate.openMainWindowAction }) {
+        if let window = launchHiddenWindow, !window.isVisible {
+            // Hidden at launch rather than closed, so bring the same window back (once; later
+            // reopening after a real close goes through openWindow).
+            window.makeKeyAndOrderFront(nil)
+            launchHiddenWindow = nil
+        } else if let open = MainActor.assumeIsolated({ AppDelegate.openMainWindowAction }) {
             open()
         } else {
             for window in NSApp.windows where window.canBecomeMain {
@@ -223,7 +261,7 @@ extension AppDelegate: NSMenuDelegate {
     fileprivate func localizeTitles(in menu: NSMenu) {
         for item in menu.items {
             switch item.action {
-            case #selector(showMainWindow): item.title = tr("Open JayceMouse", "Mở JayceMouse")
+            case #selector(showMainWindow): item.title = tr("Jayce Mouse Settings…", "Cài đặt Jayce Mouse…")
             case #selector(toggleButtons(_:)): item.title = tr("Pause Button Actions", "Tạm dừng thao tác nút")
             case #selector(toggleScroll(_:)): item.title = tr("Pause Scroll Enhancements", "Tạm dừng tăng cường cuộn")
             case #selector(NSApplication.terminate(_:)): item.title = tr("Quit JayceMouse", "Thoát JayceMouse")
@@ -242,10 +280,14 @@ extension AppDelegate: NSMenuDelegate {
 
     private func refreshMouseItems(in menu: NSMenu) {
         menu.items.filter { $0.tag == Self.mouseItemTag }.forEach(menu.removeItem)
-        var items = ConnectedMice.current().map { $0.menuItem() }
-        if items.isEmpty {
-            items = [NSMenuItem(title: tr("No mouse connected", "Chưa kết nối chuột"), action: nil, keyEquivalent: "")]
+        let general = MainActor.assumeIsolated { AppDelegate.model.config.general }
+        guard general.showMiceInMenu || general.showKeyboardsInMenu else { return }
+        let devices = ConnectedMice.current(mice: general.showMiceInMenu, keyboards: general.showKeyboardsInMenu)
+        var items = devices.map { $0.menuItem() }
+        if general.showMiceInMenu && !devices.contains(where: { !$0.isKeyboard }) {
+            items.insert(NSMenuItem(title: tr("No mouse connected", "Chưa kết nối chuột"), action: nil, keyEquivalent: ""), at: 0)
         }
+        guard !items.isEmpty else { return }
         items.append(.separator())
         for (index, item) in items.enumerated() {
             item.tag = Self.mouseItemTag

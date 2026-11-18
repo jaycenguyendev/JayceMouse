@@ -45,12 +45,14 @@ Releases from v1.0.1 on carry this attestation. The `.sha256` files next to each
 
 ## Features
 - **Smooth scrolling**: off / low / regular / high, speed low/medium/high with tick acceleration, natural direction, trackpad-style scroll phases.
-- **Scroll modifiers**: ⇧ horizontal, ⌃ quick, ⌥ precise, ⌘ zoom.
+- **Scroll modifiers**: ⇧ horizontal, ⌃ quick, ⌥ precise, ⌘ zoom (sent as a trackpad pinch, or as ⌘= / ⌘− if you prefer).
 - **Button remaps**: click, double click, triple click, hold, click & drag, click & scroll; optional keyboard modifiers or a held second button.
 - **Actions**: Mission Control, App Exposé, Launchpad, Show Desktop, Spotlight, Siri, Notification Center, Do Not Disturb, Look Up, Smart Zoom, Spaces left/right, Back/Forward, media/volume/brightness keys, custom keyboard shortcut, middle click.
 - **Gestures**: Desktop & Launchpad scroll, Scroll & Navigate (two-finger swipe), Spaces & Mission Control (three-finger swipe), scroll to switch Spaces / zoom.
 - **Pointer**: sensitivity and acceleration via the system HID acceleration setting (restored on quit).
-- **General**: menu bar item, launch at login, kill switches, lock pointer during drag, 3-/5-button presets.
+- **General**: menu bar item, launch at login, start in the menu bar (optional window at launch), kill switches, lock pointer during drag, 3-/5-button presets.
+- **Snap to OK**: when a dialog asks for confirmation, the pointer moves onto its default button.
+- **Menu bar devices**: connected mice and keyboards with their battery level, each switchable in General.
 
 ## Support
 JayceMouse is free and always will be. If it made your mouse feel better, you can buy me a coffee ☕ by scanning this

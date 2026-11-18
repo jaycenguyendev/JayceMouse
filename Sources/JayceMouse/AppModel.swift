@@ -68,6 +68,7 @@ final class AppModel: ObservableObject {
 
     let engine = InputEngine()
     private let pointer = PointerController()
+    private let dialogSnapper = DialogSnapper()
     private var saveTask: Task<Void, Never>?
     private var permissionTimer: Timer?
     private var miceTimer: Timer?
@@ -115,6 +116,15 @@ final class AppModel: ObservableObject {
         } else {
             engineRunning = engine.isRunning
         }
+        updateDialogSnapper()
+    }
+
+    private func updateDialogSnapper() {
+        dialogSnapper.setEnabled(trusted && config.general.snapToDefaultButton)
+    }
+
+    func testDialogSnap() {
+        dialogSnapper.showTestAlert()
     }
 
     func requestPermission() {
@@ -122,13 +132,22 @@ final class AppModel: ObservableObject {
         _ = AXIsProcessTrustedWithOptions(options)
     }
 
+    /// The address of the Accessibility page differs between macOS versions, so try the newest first,
+    /// then older ones, then Privacy & Security itself.
     func openAccessibilitySettings() {
-        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
-            NSWorkspace.shared.open(url)
+        let candidates = [
+            "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Accessibility",
+            "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
+            "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension",
+            "x-apple.systempreferences:com.apple.preference.security",
+        ]
+        for candidate in candidates {
+            if let url = URL(string: candidate), NSWorkspace.shared.open(url) { return }
         }
     }
 
     func shutdown() {
+        dialogSnapper.stop()
         engine.stop()
         pointer.restore()
         ConfigStore.save(config)
@@ -141,6 +160,7 @@ final class AppModel: ObservableObject {
         engine.apply(config)
         if old.pointer != config.pointer { pointer.apply(config.pointer) }
         if old.general.launchAtLogin != config.general.launchAtLogin { updateLaunchAtLogin() }
+        if old.general.snapToDefaultButton != config.general.snapToDefaultButton { updateDialogSnapper() }
         saveTask?.cancel()
         saveTask = Task { [config] in
             try? await Task.sleep(nanoseconds: 350_000_000)

@@ -166,6 +166,13 @@ do {
     let decoded = try? JSONDecoder().decode(AppConfig.self, from: Data(legacy.utf8))
     check(decoded?.general.buttonKillSwitch == true && decoded?.general.showMenuBarItem == false, "config without newer general keys keeps its values")
     check(decoded?.general.language == .system && decoded?.general.lockPointerDuringDrag == false, "missing general keys fall back to defaults")
+    let oldScroll = #"{"scroll":{"enabled":true,"smoothness":"low","speed":"high","reverseDirection":true,"trackpadSimulation":true,"preciseByDefault":false,"horizontalModifier":131072,"quickModifier":262144,"preciseModifier":524288,"zoomModifier":1048576}}"#
+    let scrollDecoded = try? JSONDecoder().decode(AppConfig.self, from: Data(oldScroll.utf8))
+    check(scrollDecoded?.scroll.smoothness == .low && scrollDecoded?.scroll.reverseDirection == true
+          && scrollDecoded?.scroll.zoomStyle == .pinch, "scroll settings without zoomStyle keep their values")
+    check(decoded?.general.showWindowAtLaunch == false && decoded?.general.snapToDefaultButton == true
+          && decoded?.general.showMiceInMenu == true && decoded?.general.showKeyboardsInMenu == true,
+          "newer general keys default when missing")
     check(decoded?.remaps.isEmpty == true, "config without newer general keys keeps its remaps")
 
     let unknown = #"{"general":{"language":"klingon","buttonKillSwitch":true}}"#

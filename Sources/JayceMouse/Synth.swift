@@ -143,6 +143,24 @@ enum Synth {
         e.post(tap: .cgSessionEventTap)
     }
 
+    // MARK: Pinch (magnification)
+
+    /// Private CGEvent fields for trackpad gestures, as used by Mac Mouse Fix and others.
+    private static func gestureField(_ raw: UInt32) -> CGEventField { unsafeBitCast(raw, to: CGEventField.self) }
+
+    /// Posts one step of a trackpad pinch. Apps treat it like the user pinching on a trackpad, so zoom
+    /// works wherever pinch-to-zoom does (browsers, Office, WPS, Preview, Maps…). Positive zooms in.
+    static func postMagnification(_ amount: Double, phase: Int64) {
+        guard let e = CGEvent(source: nil) else { return }
+        e.setIntegerValueField(gestureField(55), value: 29)     // event type: NSEventTypeGesture
+        e.setIntegerValueField(gestureField(110), value: 8)     // gesture: kIOHIDEventTypeZoom
+        e.setIntegerValueField(gestureField(132), value: phase) // began 1 / changed 2 / ended 4
+        e.setDoubleValueField(gestureField(113), value: amount) // magnification for this step
+        e.location = pointerLocation
+        e.setIntegerValueField(.eventSourceUserData, value: marker)
+        e.post(tap: .cghidEventTap)
+    }
+
     static let phaseBegan: Int64 = 1
     static let phaseChanged: Int64 = 2
     static let phaseEnded: Int64 = 4
